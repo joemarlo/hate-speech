@@ -12,8 +12,6 @@ from get_users_tweets import get_users_tweets
 # reset working directory
 os.chdir("/home/joemarlo/Dropbox/Data/Projects/hate-speech")
 
-# NOTE: run twitter_credentials.py
-
 # test the function
 tmp = get_users_tweets(user_id=25073877)
 tmp.head()
