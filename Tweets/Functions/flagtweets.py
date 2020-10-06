@@ -12,7 +12,7 @@ def flagtweet(hatespeech, data):
 
     # check if elements in hatespeech are in the text (1 for true, 0 for false):
     data['flagged'] = np.multiply([any(i in words for i in hatespeech) \
-    for words in data['text'].str.split().values],1)
+    for words in data['text'].values],1)
 
     return data
 
