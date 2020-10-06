@@ -21,7 +21,7 @@ get_users_tweets(user_id=12)
 # and 900 requests per 15min
 # https://developer.twitter.com/en/docs/twitter-api/v1/tweets/timelines/faq
 results = []
-for i in range(0, 6000):
+for i in range(0, 3000):
 
     # print status on which loop it is on
     print(f"...on sampled user {i}")
@@ -45,12 +45,14 @@ for i in range(0, 6000):
 
 # combine into one dataframe and write out
 all_results = pd.concat(results).reset_index(drop=True)
-all_results.to_csv("Tweets/Data/tweet_20201006_1533.csv", sep='|')
+all_results.to_csv("Tweets/Data/tweet_20201006_1700.tsv", sep='\t') #this has issues with all delimiters tested
+
+# first add a date column formated in string b/c pandas json formatting is weird
+all_results['Date'] = all_results['created_at'].apply(lambda x: x.strftime('%Y-%m-%d'))
+all_results.to_json('Tweets/Data/tweet_20201006_1700.json')
+
+# check number of tweets captured
+all_results.shape
 
 # check number of users captured
 len(all_results.handle.unique())
-
-# check location
-results_is_US = [is_US(location) for location in all_results.location]
-
-all_results.iloc[results_is_US, :].to_csv("Tweets/Data/locations.csv")
