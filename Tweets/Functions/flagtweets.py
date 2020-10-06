@@ -1,9 +1,6 @@
-#!/usr/bin/env python
-# coding: utf-8
-
 # # Function to flag tweets
 
-import pandas aspd
+import pandas as pd
 import numpy as np
 
 # Arguments: twitter data as a DataFrame, hate speech dictionary as a list
