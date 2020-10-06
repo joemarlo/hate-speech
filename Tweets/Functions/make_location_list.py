@@ -12,6 +12,10 @@ cities = pd.read_csv("Tweets/Functions/raw_cities.csv")
 cities['NAME'] = cities['NAME'].str.replace(' city| county| town|balance of | \(pt\.\)', '', case=False)
 cities['NAME'] = cities['NAME'].str.strip()
 
+# manual exclusions
+#'Ada' b/c it matches "Canada"
+cities = cities.loc[cities['NAME']!='Ada',:].reset_index(drop=True)
+
 # grab top 1000 values by population (includes states and counties)
 top_locations = cities.sort_values("POPESTIMATE2019", ascending=False).iloc[0:2000, :].reset_index(drop=True)
 len(top_locations.NAME.unique())

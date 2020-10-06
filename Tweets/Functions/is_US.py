@@ -26,7 +26,7 @@ def is_US(tweet_location, locations=locations):
     return(any([insensitive_match, sensitive_match]))
 
 
-# stuff only to run when not called via 'import' here
+# the below doesn't run when script is called via 'import' 
 if __name__ == "__main__":
     # test the function
     is_US("New york, NY")

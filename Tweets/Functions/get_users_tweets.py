@@ -25,7 +25,7 @@ def get_users_tweets(user_id):
     alltweets = []
 
     #make initial request for most recent tweets (200 is the maximum allowed count)
-    new_tweets = api.user_timeline(user_id = user_id, count=200)
+    new_tweets = api.user_timeline(user_id=user_id, count=200)
 
     #save most recent
     alltweets.extend(new_tweets)
@@ -55,14 +55,16 @@ def get_users_tweets(user_id):
 
         print(f"...{len(alltweets)} tweets downloaded so far")
 
-    #transform the tweepy tweets into a 2D array that will populate the csv
+    #transform the tweepy tweets into a 2D array that will populate the dataframe
     outtweets = [[tweet.id_str, tweet.created_at, tweet.text, tweet.user.location, tweet.user.screen_name] for tweet in alltweets]
 
+    # turn tweets into a dataframe
     out_df = pd.DataFrame(outtweets, columns=['id', 'created_at', 'text', 'location', 'handle'])
 
     return(out_df)
 
-# stuff only to run when not called via 'import' here
+
+# the below doesn't run when script is called via 'import'
 if __name__ == "__main__":
     # test the function
     get_users_tweets(25073877) #realDonaldTrump
