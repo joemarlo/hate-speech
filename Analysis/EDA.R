@@ -1,5 +1,3 @@
-library(tidyverse)
-library(jsonlite)
 setwd("/home/joemarlo/Dropbox/Data/Projects/hate-speech")
 source('Plots/ggplot_settings.R')
 
