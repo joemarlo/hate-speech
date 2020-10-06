@@ -39,7 +39,7 @@ tweets %>%
   geom_line() +
   # scale_x_date(date_breaks = '6 month') +
   scale_y_continuous(labels = scales::comma_format()) +
-  labs(title = 'Tweets captured per user',
+  labs(title = 'Tweets captured per month',
        subtitle = paste0('n tweets = ', scales::comma_format()(nrow(tweets))),
        x = NULL,
        y = 'Count of tweets per month') +
