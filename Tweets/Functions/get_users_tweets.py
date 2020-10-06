@@ -2,6 +2,11 @@ import tweepy
 import pandas as pd
 import os
 
+# import custom functions
+os.chdir("/home/joemarlo/Dropbox/Data/Projects/hate-speech/Tweets/Functions")
+from is_US import is_US, locations
+
+# reset working directory
 os.chdir("/home/joemarlo/Dropbox/Data/Projects/hate-speech")
 
 # import twitter credentials
@@ -25,6 +30,13 @@ def get_users_tweets(user_id):
     #save most recent
     alltweets.extend(new_tweets)
 
+    # if user is not in the US then stop here
+    try:
+        if not is_US(alltweets[0].user.location):
+            return
+    except IndexError:
+        return
+
     #save the id of the oldest tweet less one
     oldest = alltweets[-1].id - 1
 
@@ -32,7 +44,7 @@ def get_users_tweets(user_id):
     while len(new_tweets) > 0:
         print(f"getting tweets before {oldest}")
 
-        #all subsiquent requests use the max_id param to prevent duplicates
+        #all subsequent requests use the max_id param to prevent duplicates
         new_tweets = api.user_timeline(user_id = user_id, count=200, max_id=oldest)
 
         #save most recent tweets
@@ -56,4 +68,5 @@ if __name__ == "__main__":
     get_users_tweets(25073877) #realDonaldTrump
     get_users_tweets(9024901243) #random id that doesn't work
     get_users_tweets(36523) #random id that does work
+    get_users_tweets(380871320)
     get_users_tweets('realDonaldTrump') #this returns george's timeline

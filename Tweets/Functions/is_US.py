@@ -6,7 +6,7 @@ os.chdir("/home/joemarlo/Dropbox/Data/Projects/hate-speech")
 # read in the list of locations to match
 locations = pd.read_csv("Tweets/Functions/cleaned_locations.csv").drop("Unnamed: 0", axis=1)
 
-def is_US(tweet_location):
+def is_US(tweet_location, locations=locations):
     # function takes in the twitter user's self described location and returns
     #   True/False if any of the text matches the top 1000 US cities, a US state
     #   full name or US state abbreviation
@@ -25,9 +25,12 @@ def is_US(tweet_location):
 
     return(any([insensitive_match, sensitive_match]))
 
-# test the function
-is_US("New york, NY")
-is_US("alksjdl")
-is_US("mo")
-is_US("MO")
-is_US("Denver")
+
+# stuff only to run when not called via 'import' here
+if __name__ == "__main__":
+    # test the function
+    is_US("New york, NY")
+    is_US("alksjdl")
+    is_US("mo")
+    is_US("MO")
+    is_US("Denver")
