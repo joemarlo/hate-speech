@@ -1,5 +1,4 @@
 import pandas as pd
-import datetime as dt
 import os
 import requests
 from bs4 import BeautifulSoup
@@ -16,7 +15,7 @@ cities['NAME'] = cities['NAME'].str.strip()
 # grab top 1000 values by population (includes states and counties)
 top_locations = cities.sort_values("POPESTIMATE2019", ascending=False).iloc[0:2000, :].reset_index(drop=True)
 len(top_locations.NAME.unique())
-top_locations = top_locations.drop(columns=['STNAME', 'POPESTIMATE2019'])
+top_locations = top_locations.drop(columns=['STNAME', 'POPESTIMATE2019']).drop_duplicates()
 
 # add state abbreviations by scraping the table
 URL = "https://www.ssa.gov/international/coc-docs/states.html"
@@ -37,7 +36,7 @@ state_abbrev['State_abbrev'] = state_abbrev['State_abbrev'].str.strip()
 top_locations['State_abbrev'] = state_abbrev['State_abbrev']
 
 # rename columns
-top_locations = top_locations.rename(columns={"NAME": "Case_insensitive", "State_abbrev": "Case_sensitive"})
+top_locations = top_locations.rename(columns={"NAME": "Case_insensitive", "State_abbrev": "Case_sensitive"}).reset_index(drop=True)
 
 # write out
 top_locations.to_csv("Tweets/Functions/cleaned_locations.csv")

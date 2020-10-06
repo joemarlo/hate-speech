@@ -1,19 +1,10 @@
 import pandas as pd
-import datetime as dt
 import os
 
 os.chdir("/home/joemarlo/Dropbox/Data/Projects/hate-speech")
 
 # read in the list of locations to match
 locations = pd.read_csv("Tweets/Functions/cleaned_locations.csv").drop("Unnamed: 0", axis=1)
-
-test_string = "New York, NY"
-
-# case insensitive match
-insensitive_match = any([(location.lower() in test_string.lower()) for location in locations.Case_insensitive])
-
-# case sensitive match
-sensitive_match = any([(location in test_string) for location in locations.Case_sensitive[0:56]])
 
 def is_US(tweet_location):
     # function takes in the twitter user's self described location and returns
@@ -30,12 +21,12 @@ def is_US(tweet_location):
     insensitive_match = any([(location.lower() in tweet_location.lower()) for location in locations.Case_insensitive])
 
     # case sensitive match
-    sensitive_match = any([(location in tweet_location) for location in locations.Case_sensitive[0:56]])
+    sensitive_match = any([(location in tweet_location) for location in locations.Case_sensitive.dropna()])
 
     return(any([insensitive_match, sensitive_match]))
 
-
-is_US("New york")
+# test the function
+is_US("New york, NY")
 is_US("alksjdl")
 is_US("mo")
 is_US("MO")
