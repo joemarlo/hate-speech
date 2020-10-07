@@ -12,16 +12,16 @@ from get_users_tweets import get_users_tweets
 os.chdir("/home/joemarlo/Dropbox/Data/Projects/hate-speech")
 
 # test the function
-get_users_tweets(user_id=25073877)
-get_users_tweets(user_id=380871320)
-get_users_tweets(user_id=12)
+#get_users_tweets(user_id=25073877)
+#get_users_tweets(user_id=380871320)
+#get_users_tweets(user_id=12)
 
 # run the function on randomly sampled tweets
 # rate limit is 100,000 requests per day
 # and 900 requests per 15min
 # https://developer.twitter.com/en/docs/twitter-api/v1/tweets/timelines/faq
 results = []
-for i in range(0, 3000):
+for i in range(0, 20000):
 
     # print status on which loop it is on
     print(f"...on sampled user {i}")
@@ -45,13 +45,13 @@ for i in range(0, 3000):
 
 # combine into one dataframe and write out
 all_results = pd.concat(results).reset_index(drop=True)
-all_results.to_csv("Tweets/Data/tweet_20201006_1700.tsv", sep='\t') #this has issues with all delimiters tested
+#all_results.to_csv("Tweets/Data/tweet_20201006_1700.tsv", sep='\t') #this has issues with all delimiters tested
 
 # first add a date column formated in string b/c pandas json formatting is weird
 all_results['Date'] = all_results['created_at'].apply(lambda x: x.strftime('%Y-%m-%d'))
 
 # write out to json (this doesn't have delimter issues)
-all_results.to_json('Tweets/Data/tweet_20201006_1700.json')
+all_results.to_json('Tweets/Data/tweet_20201007_0800.json')
 
 # check number of tweets captured
 all_results.shape

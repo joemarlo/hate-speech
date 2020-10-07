@@ -2,7 +2,7 @@ setwd("/home/joemarlo/Dropbox/Data/Projects/hate-speech")
 source('Plots/ggplot_settings.R')
 
 # read in the data
-tweets_json <- jsonlite::fromJSON("Tweets/Data/tweet_20201006_1700.json")
+tweets_json <- jsonlite::fromJSON(txt = "Tweets/Data/tweet_20201006_1700.json")
 
 # convert from nested json to flat df
 tweets <- map_dfc(names(tweets_json), function(col){
@@ -30,12 +30,12 @@ tweets %>%
   mutate(
     Date = as.Date(Date),
     Period = as.Date(paste0(lubridate::year(Date), "-", 
-                  lubridate::month(Date), "-01"))) %>% 
+                            lubridate::month(Date), "-01"))) %>% 
   group_by(Period) %>% 
   tally() %>% 
   ggplot(aes(x = Period, y = n, color = n)) +
   geom_line() +
-  # scale_x_date(date_breaks = '6 month') +
+  geom_point() +
   scale_y_continuous(labels = scales::comma_format()) +
   labs(title = 'Tweets captured per month',
        subtitle = paste0('n tweets = ', scales::comma_format()(nrow(tweets))),
