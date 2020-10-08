@@ -2,6 +2,13 @@
 
 Final project for NYU Statistical Consulting class.
 
+## Current collection status
+
+<p align="center">
+<img src="Plots/tweets_over_time.png" width=79%>
+</p>
+
+
 ## Background
 Hate speech on social media has been identified as a major problem, yet little is know about the prevalence and patterns of hate speech on social media sites. In a [2019 paper](https://alexandra-siegel.com/wp-content/uploads/2019/05/Siegel_et_al_election_hatespeech_qjps.pdf), Siegel and colleagues investigated the prevalence of racially motivated hate speech on twitter in the months before, during and after the 2016 presidential election. For this project, we aim to replicate these research methods to investigate LGBTQ+ directed hate speech.
 

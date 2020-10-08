@@ -15,7 +15,9 @@ tweets <- map_dfr(list.files("Tweets/Data", pattern = ".json"),
         setNames(names(tweets_json))
       
       return(tweets)
-    })
+    }) %>% 
+  # created_at field is milliseconds since 1970
+  mutate(Date = as.Date(lubridate::as_datetime(created_at/1000)))
     
 # tweets per user
 tweets %>% 
@@ -34,21 +36,19 @@ ggsave("Plots/tweets_by_user.png",
        height = 5)
 
 # tweets over time
-# created_at field is milliseconds since 1970
 tweets %>% 
-  mutate(Date = as.Date(lubridate::as_datetime(created_at/1000)),
-         Period = as.Date(paste0(lubridate::year(Date), "-", 
+  mutate(Period = as.Date(paste0(lubridate::year(Date), "-", 
                                  lubridate::month(Date), "-01"))) %>% 
   group_by(Period) %>% 
   tally() %>% 
   ggplot(aes(x = Period, y = n, color = n)) +
   geom_rect(xmin = as.Date("2016-07-01"), xmax = as.Date("2017-12-01"),
-            ymin = 0, ymax = 15000, alpha = 0.3, fill = 'grey85', size = 0) +
+            ymin = 0, ymax = 25000, alpha = 0.3, fill = 'grey85', size = 0) +
   geom_line() +
   geom_point() +
   scale_x_date(date_breaks = "1 year", date_labels = "%Y") +
   scale_y_continuous(labels = scales::comma_format()) +
-  labs(title = 'Tweets collected per month',
+  labs(title = 'Tweets collected by tweet date',
        subtitle = paste0('n tweets = ', scales::comma_format()(nrow(tweets)), "\n",
                          'n users = ', scales::comma_format()(n_distinct(tweets$handle))),
        x = NULL,
