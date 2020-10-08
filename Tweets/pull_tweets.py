@@ -25,9 +25,32 @@ os.chdir("/home/pi/hate-speech")
 results = []
 for i in range(0, 40000):
 
+    # message at beginning
+    if (i == 0):
+        print("...initiating")
+
     # every 50 loops, print status
     if (i + 1) % 50 == 0:
         print(f"...on sampled user {i + 1}. Collected {len(pd.concat(results).index)} tweets from {len(pd.concat(results).handle.unique())} US users so far.")
+
+    # every 5000 loops, save to json and empty results list (due to memory)
+    if (i + 1) % 5000 == 0:
+        
+        # message to user
+        print("...dumping memory and writing tweets out to Tweets/Data/*.json")
+        
+        try:
+            # combine into one dataframe and write out
+            all_results = pd.concat(results).reset_index(drop=True)
+        
+            # write out to json
+            all_results.to_json('Tweets/Data/tweet_' + time.strftime("%Y%m%d_%H%M%S") + '.json')
+        
+            # clear list
+            results = []
+        
+        except:
+            continue
 
     # sample for user ids
     user_id = np.random.randint(low=1, high=1000000000, size=1)[0]
@@ -36,7 +59,7 @@ for i in range(0, 40000):
     try:
         result = get_users_tweets(user_id=user_id)
     except tweepy.RateLimitError:
-        print("...sleeping for 5min due to rate limit")
+        print("...sleeping for 5min due to Twitter API rate limit")
         time.sleep((5 * 60) + 1)
         continue
     except:
@@ -44,6 +67,7 @@ for i in range(0, 40000):
 
     # store the results
     results.append(result)
+    
 
 
 # combine into one dataframe and write out
@@ -54,7 +78,7 @@ all_results = pd.concat(results).reset_index(drop=True)
 all_results['Date'] = all_results['created_at'].apply(lambda x: x.strftime('%Y-%m-%d'))
 
 # write out to json (this doesn't have delimter issues)
-all_results.to_json('Tweets/Data/tweet_20201007_2105.json')
+all_results.to_json('Tweets/Data/tweet_' + time.strftime("%Y%m%d_%H%M%S") + '.json')
 
 # check number of tweets captured
 all_results.shape
