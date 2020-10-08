@@ -3,11 +3,13 @@ import pandas as pd
 import os
 
 # import custom functions
-os.chdir("/home/joemarlo/Dropbox/Data/Projects/hate-speech/Tweets/Functions")
+#os.chdir("/home/joemarlo/Dropbox/Data/Projects/hate-speech/Tweets/Functions")
+os.chdir("/home/pi/hate-speech/Tweets/Functions")
 from is_US import is_US, locations
 
 # reset working directory
-os.chdir("/home/joemarlo/Dropbox/Data/Projects/hate-speech")
+#os.chdir("/home/joemarlo/Dropbox/Data/Projects/hate-speech")
+os.chdir("/home/pi/hate-speech")
 
 # import twitter credentials
 from twitter_credentials import consumer_key, consumer_secret, access_key, access_secret
@@ -42,7 +44,7 @@ def get_users_tweets(user_id):
 
     #keep grabbing tweets until there are no tweets left to grab
     while len(new_tweets) > 0:
-        print(f"getting tweets before {oldest}")
+        #print(f"getting tweets before {oldest}")
 
         #all subsequent requests use the max_id param to prevent duplicates
         new_tweets = api.user_timeline(user_id = user_id, count=200, max_id=oldest)
@@ -53,7 +55,7 @@ def get_users_tweets(user_id):
         #update the id of the oldest tweet less one
         oldest = alltweets[-1].id - 1
 
-        print(f"...{len(alltweets)} tweets downloaded so far")
+        #print(f"...{len(alltweets)} tweets downloaded so far")
 
     #transform the tweepy tweets into a 2D array that will populate the dataframe
     outtweets = [[tweet.id_str, tweet.created_at, tweet.text, tweet.user.location, tweet.user.screen_name] for tweet in alltweets]

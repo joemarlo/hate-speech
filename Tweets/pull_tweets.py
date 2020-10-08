@@ -5,11 +5,13 @@ import pandas as pd
 import numpy as np
 
 # import custom functions
-os.chdir("/home/joemarlo/Dropbox/Data/Projects/hate-speech/Tweets/Functions")
+#os.chdir("/home/joemarlo/Dropbox/Data/Projects/hate-speech/Tweets/Functions")
+os.chdir("/home/pi/hate-speech/Tweets/Functions")
 from get_users_tweets import get_users_tweets
 
 # reset working directory
-os.chdir("/home/joemarlo/Dropbox/Data/Projects/hate-speech")
+#os.chdir("/home/joemarlo/Dropbox/Data/Projects/hate-speech")
+os.chdir("/home/pi/hate-speech")
 
 # test the function
 #get_users_tweets(user_id=25073877)
@@ -21,10 +23,11 @@ os.chdir("/home/joemarlo/Dropbox/Data/Projects/hate-speech")
 # and 900 requests per 15min
 # https://developer.twitter.com/en/docs/twitter-api/v1/tweets/timelines/faq
 results = []
-for i in range(0, 20000):
+for i in range(0, 40000):
 
-    # print status on which loop it is on
-    print(f"...on sampled user {i}")
+    # every 50 loops, print status
+    if (i + 1) % 50 == 0:
+        print(f"...on sampled user {i + 1}. Collected {len(pd.concat(results).index)} tweets from {len(pd.concat(results).handle.unique())} US users so far.")
 
     # sample for user ids
     user_id = np.random.randint(low=1, high=1000000000, size=1)[0]
@@ -33,9 +36,9 @@ for i in range(0, 20000):
     try:
         result = get_users_tweets(user_id=user_id)
     except tweepy.RateLimitError:
-            print(f"...sleeping for 5min due to rate limit")
-            time.sleep((5 * 60) + 1)
-            continue
+        print("...sleeping for 5min due to rate limit")
+        time.sleep((5 * 60) + 1)
+        continue
     except:
         continue
 
@@ -51,7 +54,7 @@ all_results = pd.concat(results).reset_index(drop=True)
 all_results['Date'] = all_results['created_at'].apply(lambda x: x.strftime('%Y-%m-%d'))
 
 # write out to json (this doesn't have delimter issues)
-all_results.to_json('Tweets/Data/tweet_20201007_0800.json')
+all_results.to_json('Tweets/Data/tweet_20201007_2105.json')
 
 # check number of tweets captured
 all_results.shape
