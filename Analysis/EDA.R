@@ -34,11 +34,11 @@ ggsave("Plots/tweets_by_user.png",
        height = 5)
 
 # tweets over time
+# created_at field is milliseconds since 1970
 tweets %>% 
-  mutate(
-    Date = as.Date(Date),
-    Period = as.Date(paste0(lubridate::year(Date), "-", 
-                            lubridate::month(Date), "-01"))) %>% 
+  mutate(Date = as.Date(lubridate::as_datetime(created_at/1000)),
+         Period = as.Date(paste0(lubridate::year(Date), "-", 
+                                 lubridate::month(Date), "-01"))) %>% 
   group_by(Period) %>% 
   tally() %>% 
   ggplot(aes(x = Period, y = n, color = n)) +
