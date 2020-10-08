@@ -43,7 +43,7 @@ tweets %>%
   tally() %>% 
   ggplot(aes(x = Period, y = n, color = n)) +
   geom_rect(xmin = as.Date("2016-07-01"), xmax = as.Date("2017-12-01"),
-            ymin = 0, ymax = 30000, alpha = 0.3, fill = 'grey85', size = 0) +
+            ymin = 0, ymax = 30000, alpha = 0.3, fill = 'gray90', size = 0) +
   geom_line() +
   geom_point() +
   scale_x_date(date_breaks = "1 year", date_labels = "%Y") +

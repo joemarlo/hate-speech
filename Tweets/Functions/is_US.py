@@ -2,7 +2,10 @@ import pandas as pd
 import os
 
 #os.chdir("/home/joemarlo/Dropbox/Data/Projects/hate-speech")
-os.chdir("/home/pi/hate-speech")
+#os.chdir("/home/pi/hate-speech")
+script_directory = os.path.dirname(os.path.realpath(__file__))
+os.chdir(script_directory)
+os.chdir("../..")
 
 # read in the list of locations to match
 locations = pd.read_csv("Tweets/Functions/cleaned_locations.csv").drop("Unnamed: 0", axis=1)

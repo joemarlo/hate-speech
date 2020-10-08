@@ -4,12 +4,14 @@ import os
 
 # import custom functions
 #os.chdir("/home/joemarlo/Dropbox/Data/Projects/hate-speech/Tweets/Functions")
-os.chdir("/home/pi/hate-speech/Tweets/Functions")
+#os.chdir("/home/pi/hate-speech/Tweets/Functions")
+script_directory = os.path.dirname(os.path.realpath(__file__))
+os.chdir(script_directory)
 from is_US import is_US, locations
 
 # reset working directory
 #os.chdir("/home/joemarlo/Dropbox/Data/Projects/hate-speech")
-os.chdir("/home/pi/hate-speech")
+#os.chdir("/home/pi/hate-speech")
 
 # import twitter credentials
 from twitter_credentials import consumer_key, consumer_secret, access_key, access_secret
