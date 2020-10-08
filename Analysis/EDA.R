@@ -51,6 +51,7 @@ tweets %>%
   labs(title = 'Tweets collected by tweet date',
        subtitle = paste0('n tweets = ', scales::comma_format()(nrow(tweets)), "\n",
                          'n users = ', scales::comma_format()(n_distinct(tweets$handle))),
+       caption = paste0("As of ", Sys.Date()),
        x = NULL,
        y = 'Count of tweets per month') +
   theme(legend.position = 'none',
