@@ -43,6 +43,9 @@ for i in range(0, 40000):
             # combine into one dataframe and write out
             all_results = pd.concat(results).reset_index(drop=True)
         
+            # first add a date column formated in string b/c pandas json formatting is in milliseconds
+            all_results['Date'] = all_results['created_at'].apply(lambda x: x.strftime('%Y-%m-%d'))
+        
             # write out to json
             all_results.to_json('Tweets/Data/tweet_' + time.strftime("%Y%m%d_%H%M%S") + '.json')
         
@@ -73,7 +76,7 @@ for i in range(0, 40000):
 all_results = pd.concat(results).reset_index(drop=True)
 #all_results.to_csv("Tweets/Data/tweet_20201006_1700.tsv", sep='\t') #this has issues with all delimiters tested
 
-# first add a date column formated in string b/c pandas json formatting is weird
+# first add a date column formated in string b/c pandas json formatting is in milliseconds
 all_results['Date'] = all_results['created_at'].apply(lambda x: x.strftime('%Y-%m-%d'))
 
 # write out to json (this doesn't have delimter issues)
