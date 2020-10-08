@@ -31,9 +31,9 @@ for i in range(0, 40000):
 
     # every 50 loops, print status
     if (i + 1) % 50 == 0:
-        print(f"...on sampled user {i + 1}. Collected {len(pd.concat(results).index)} tweets from {len(pd.concat(results).handle.unique())} US users so far.")
+        print(f"...on sampled user {i + 1}. Collected {len(pd.concat(results).index)} tweets from {len(pd.concat(results).handle.unique())} US users for this json file.")
 
-    # every 5000 loops, save to json and empty results list (due to memory)
+    # every 5000 loops, save to json and empty results list (due to 1gb memory on rpi)
     if (i + 1) % 5000 == 0:
         
         # message to user
@@ -48,7 +48,6 @@ for i in range(0, 40000):
         
             # clear list
             results = []
-        
         except:
             continue
 
