@@ -5,13 +5,13 @@ import numpy as np
 import tweepy
 
 # import custom functions
-os.chdir("/home/joemarlo/Dropbox/Data/Projects/hate-speech/Tweets/Functions")
-#os.chdir("/home/pi/hate-speech/Tweets/Functions")
+#os.chdir("/home/joemarlo/Dropbox/Data/Projects/hate-speech/Tweets/Functions")
+os.chdir("/home/pi/hate-speech/Tweets/Functions")
 from is_US import is_US, locations
 
 # reset working directory
-os.chdir("/home/joemarlo/Dropbox/Data/Projects/hate-speech")
-#os.chdir("/home/pi/hate-speech")
+#os.chdir("/home/joemarlo/Dropbox/Data/Projects/hate-speech")
+os.chdir("/home/pi/hate-speech")
 
 # import twitter credentials
 from twitter_credentials import consumer_key, consumer_secret, access_key, access_secret
@@ -24,7 +24,7 @@ api = tweepy.API(auth)
 
 US_ids = []
 US_ids_locations = []
-for i in range(0, 10000):
+for i in range(0, 25000):
 
     # message at beginning
     if (i == 0):

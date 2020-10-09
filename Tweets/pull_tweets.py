@@ -37,8 +37,8 @@ for i in range(0, 1000):
         except:
             print(f"...on sampled user {i + 1}")
 
-    # every 5000 loops, save to json and empty results list (due to 1gb memory on raspberry pi)
-    if (i + 1) % 5000 == 0:
+    # every 500 loops, save to json and empty results list (due to 1gb memory on raspberry pi)
+    if (i + 1) % 500 == 0:
 
         try:
             # combine into one dataframe and write out
