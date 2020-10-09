@@ -34,20 +34,11 @@ def get_users_tweets(user_id):
     #save most recent
     alltweets.extend(new_tweets)
 
-    # if user is not in the US then stop here
-    try:
-        if not is_US(alltweets[0].user.location):
-            return
-    except IndexError:
-        return
-
     #save the id of the oldest tweet less one
     oldest = alltweets[-1].id - 1
 
     #keep grabbing tweets until there are no tweets left to grab
     while len(new_tweets) > 0:
-        #print(f"getting tweets before {oldest}")
-
         #all subsequent requests use the max_id param to prevent duplicates
         new_tweets = api.user_timeline(user_id = user_id, count=200, max_id=oldest)
 
@@ -57,13 +48,12 @@ def get_users_tweets(user_id):
         #update the id of the oldest tweet less one
         oldest = alltweets[-1].id - 1
 
-        #print(f"...{len(alltweets)} tweets downloaded so far")
 
     #transform the tweepy tweets into a 2D array that will populate the dataframe
-    outtweets = [[tweet.id_str, tweet.created_at, tweet.text, tweet.user.location, tweet.user.screen_name] for tweet in alltweets]
+    outtweets = [[tweet.id_str, tweet.created_at, tweet.text, tweet.user.location, tweet.user.screen_name, tweet.user.id] for tweet in alltweets]
 
     # turn tweets into a dataframe
-    out_df = pd.DataFrame(outtweets, columns=['id', 'created_at', 'text', 'location', 'handle'])
+    out_df = pd.DataFrame(outtweets, columns=['id', 'created_at', 'text', 'location', 'handle', 'user_id'])
 
     return(out_df)
 

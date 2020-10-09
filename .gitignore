@@ -1,5 +1,6 @@
 twitter_credentials.py
 __pycache__
+__pycache__/
 
 Tweets/Data/
 .Rhistory

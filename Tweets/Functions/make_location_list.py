@@ -36,6 +36,9 @@ state_abbrev = pd.DataFrame(tab_data, columns=['Name', 'State_abbrev'])
 # trim leading spaces
 state_abbrev['State_abbrev'] = state_abbrev['State_abbrev'].str.strip()
 
+# add "USA"
+state_abbrev = state_abbrev.append(pd.DataFrame({'State_abbrev': ["USA"]}), ignore_index=True)
+
 # add abbrev to top locations df
 top_locations['State_abbrev'] = state_abbrev['State_abbrev']
 

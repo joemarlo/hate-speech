@@ -15,12 +15,16 @@ from get_users_tweets import get_users_tweets
 #os.chdir("/home/joemarlo/Dropbox/Data/Projects/hate-speech")
 #os.chdir("/home/pi/hate-speech")
 
+# read in the list of locations to match
+US_ids = pd.read_csv("Tweets/Functions/US_ids.csv").drop("Unnamed: 0", axis=1)
+
+
 # run the function on randomly sampled tweets
 # rate limit is 100,000 requests per day
 # and 900 requests per 15min
 # https://developer.twitter.com/en/docs/twitter-api/v1/tweets/timelines/faq
 results = []
-for i in range(0, 40000):
+for i in range(0, 1000):
 
     # message at beginning
     if (i == 0):
@@ -29,33 +33,33 @@ for i in range(0, 40000):
     # every 50 loops, print status
     if (i + 1) % 50 == 0:
         try:
-            print(f"...on sampled user {i + 1}. Collected {len(pd.concat(results).index)} tweets from {len(pd.concat(results).handle.unique())} US users for this json file.")
+            print(f"...on sampled user {i + 1}. Collected {len(pd.concat(results).index)} tweets from {len(pd.concat(results).handle.unique())} users for this json file.")
         except:
             print(f"...on sampled user {i + 1}")
 
     # every 5000 loops, save to json and empty results list (due to 1gb memory on raspberry pi)
     if (i + 1) % 5000 == 0:
 
-        # message to user
-        print("...dumping memory and writing tweets out to Tweets/Data/*.json")
-
         try:
             # combine into one dataframe and write out
             all_results = pd.concat(results).reset_index(drop=True)
 
-            # first add a date column formated in string b/c pandas json formatting is in milliseconds
-            all_results['Date'] = all_results['created_at'].apply(lambda x: x.strftime('%Y-%m-%d'))
-
             # write out to json
             all_results.to_json('Tweets/Data/tweet_' + time.strftime("%Y%m%d_%H%M%S") + '.json')
+
+            # message to user
+            print("...dumping memory and writing tweets out to Tweets/Data/*.json")
 
             # clear list
             results = []
         except:
+            # clear list and print message to user
+            results = []
+            print("...dumping memory because error writing tweets out to Tweets/Data/*.json")
             continue
 
-    # sample for user ids
-    user_id = np.random.randint(low=1, high=1000000000, size=1)[0]
+    # get the user id from the list
+    user_id = US_ids.ID[i]
 
     # get the tweet history
     try:
@@ -70,26 +74,4 @@ for i in range(0, 40000):
     # store the results
     results.append(result)
 
-
-# the below doesn't run when script is called via 'import'
-if __name__ == "__main__":
-    # test the function
-    get_users_tweets(user_id=25073877)
-    get_users_tweets(user_id=380871320)
-    get_users_tweets(user_id=12)
-
-    # combine into one dataframe and write out
-    all_results = pd.concat(results).reset_index(drop=True)
-    #all_results.to_csv("Tweets/Data/tweet_20201006_1700.tsv", sep='\t') #this has issues with all delimiters tested
-
-    # first add a date column formated in string b/c pandas json formatting is in milliseconds
-    all_results['Date'] = all_results['created_at'].apply(lambda x: x.strftime('%Y-%m-%d'))
-
-    # write out to json (this doesn't have delimter issues)
-    all_results.to_json('Tweets/Data/tweet_' + time.strftime("%Y%m%d_%H%M%S") + '.json')
-
-    # check number of tweets captured
-    all_results.shape
-
-    # check number of users captured
-    len(all_results.handle.unique())
+print("...script finished")

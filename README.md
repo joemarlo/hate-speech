@@ -29,12 +29,13 @@ We have developed a content dictionary of words associated with LGBTQ+ directed 
 
 ### Usage
 1. Clone this repo
-2. Add file 'twitter_credentials.py' to the root folder that defines the following objects:
-  - `consumer_key`
-  - `consumer_secret`
-  - `access_key`
-  - `access_secret`
+2. Add file `twitter_credentials.py` to the root folder that defines the following objects:
+    - `consumer_key`
+    - `consumer_secret`
+    - `access_key`
+    - `access_secret`
 3. Navigate to the root folder and run `ipython Tweets/pull_tweets.py` in terminal. Pulled tweets will be saved into Tweets/Data/*.json after sampling every 5,000 user ids. Note that the following packages should be installed beforehand (e.g. `pip3 install numpy`):
-  - `numpy`
-  - `pandas`
-  - `tweepy`
+    - `numpy`
+    - `pandas`
+    - `tweepy`
+    - `ipython`
