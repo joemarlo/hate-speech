@@ -6,17 +6,17 @@ import numpy as np
 
 # import custom functions
 #os.chdir("/home/joemarlo/Dropbox/Data/Projects/hate-speech/Tweets/Functions")
-#os.chdir("/home/pi/hate-speech/Tweets/Functions")
+os.chdir("/home/pi/hate-speech/Tweets/Functions")
 script_directory = os.path.dirname(os.path.realpath(__file__))
 os.chdir(os.path.join(script_directory, "Functions"))
 from get_users_tweets import get_users_tweets
 
 # reset working directory
 #os.chdir("/home/joemarlo/Dropbox/Data/Projects/hate-speech")
-#os.chdir("/home/pi/hate-speech")
+os.chdir("/home/pi/hate-speech")
 
 # read in the list of locations to match
-US_ids = pd.read_csv("Tweets/Functions/US_ids.csv").drop("Unnamed: 0", axis=1)
+US_ids = pd.read_csv("Tweets/Functions/US_ids_20201009_162551.csv").drop("Unnamed: 0", axis=1)
 
 
 # run the function on randomly sampled tweets
@@ -24,7 +24,7 @@ US_ids = pd.read_csv("Tweets/Functions/US_ids.csv").drop("Unnamed: 0", axis=1)
 # and 900 requests per 15min
 # https://developer.twitter.com/en/docs/twitter-api/v1/tweets/timelines/faq
 results = []
-for i in range(0, 1000):
+for i in range(0, len(US_ids.ID)):
 
     # message at beginning
     if (i == 0):
@@ -37,8 +37,8 @@ for i in range(0, 1000):
         except:
             print(f"...on sampled user {i + 1}")
 
-    # every 500 loops, save to json and empty results list (due to 1gb memory on raspberry pi)
-    if (i + 1) % 500 == 0:
+    # every 250 loops, save to json and empty results list (due to 1gb memory on raspberry pi)
+    if (i + 1) % 250 == 0:
 
         try:
             # combine into one dataframe and write out
@@ -74,4 +74,9 @@ for i in range(0, 1000):
     # store the results
     results.append(result)
 
-print("...script finished")
+
+# combine into one dataframe and write out
+all_results = pd.concat(results).reset_index(drop=True)
+# write out to json
+all_results.to_json('Tweets/Data/tweet_' + time.strftime("%Y%m%d_%H%M%S") + '.json')
+print("...script finished. Just wrote out last json file.")

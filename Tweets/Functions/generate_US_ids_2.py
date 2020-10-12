@@ -21,35 +21,25 @@ auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
 auth.set_access_token(access_key, access_secret)
 api = tweepy.API(auth)
 
+# read in pre-generated sample of IDs to check
+IDs_to_check = pd.read_csv("Tweets/Functions/IDs_to_check_one.csv").iloc[:, 1]
 
-checked_ids = []
+#checked_ids = []
 all_US_IDs = 0
 US_ids = []
 US_ids_locations = []
-#for i in range(0, 400000):
-i = -1
-while (all_US_IDs < 250000):
-    i += 1
-    
+for i in range(int(len(IDs_to_check)/100)):
+        
     # message at beginning
     if (i == 0):
         print("...initiating")
 
     # every 50 loops, print status
     if (i + 1) % 50 == 0:
-        print(f"...on batch {i + 1}. Checked {len(checked_ids)} IDs overall and found {len(US_ids)} US IDs for this csv file.")
+        print(f"...on batch {i + 1}. Found {len(US_ids)} US IDs for this csv file.")
 
-    # generate 100 random ids
-    batch = list(np.random.randint(low=1, high=10000000000, size=100, dtype=np.int64))
-    
-    # remove IDs that have already been used
-    batch = np.array(batch)[~np.in1d(batch, checked_ids)].tolist()
-    
-    # fill batch
-    while (len(batch) != 100):
-        batch = np.append(batch, np.random.randint(low=1, high=10000000000, size=100-len(batch), dtype=np.int64)).tolist()
-        # remove IDs that have already been used
-        batch = np.array(batch)[~np.in1d(batch, checked_ids)].tolist()
+    # get 100 IDs
+    batch = IDs_to_check[range(i*100, (i*100)+100)].tolist()
 
     # get attributes of those ids
     try:
@@ -60,9 +50,6 @@ while (all_US_IDs < 250000):
         continue
     except:
         continue
-
-    # add batch to list of checked_ids
-    checked_ids = np.append(checked_ids, batch)
 
     # check if users are in the US and add to list
     for id in batch_attributes:
@@ -109,3 +96,4 @@ print("...script finished. Just wrote out last csv file.")
 
 # write out
 #US_ids_df.to_csv("Tweets/Functions/US_ids.csv")
+
