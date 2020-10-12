@@ -35,7 +35,7 @@ for i in range(0, 25000):
         print(f"...on batch {i + 1}. {len(US_ids)} US IDs found so far.")
 
     # generate 100 random ids
-    batch = list(np.random.randint(low=1, high=10000000000, size=100))
+    batch = list(np.random.randint(low=1, high=10000000000, size=100, dtype=np.int64))
 
     # get attributes of those ids
     try:

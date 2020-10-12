@@ -29,6 +29,7 @@ tweets %>%
   labs(title = 'Tweets collected per user',
        subtitle = paste0('n tweets = ', scales::comma_format()(nrow(tweets)), "\n",
                          'n users = ', scales::comma_format()(n_distinct(tweets$handle))),
+       caption = paste0("As of ", Sys.Date()),
        x = "Tweets per user",
        y = 'Count of users')
 ggsave("Plots/tweets_by_user.png",
@@ -87,11 +88,31 @@ ggsave("Plots/users_over_time.png",
 # users by oldest tweet
 tweets %>% 
   mutate(Period = as.Date(paste0(lubridate::year(Date), "-",
-                                 lubridate::month(Date), "-01"))) %>%
+                                 ceiling(lubridate::month(Date) / 6) * 6, "-01"))) %>%
   group_by(handle) %>% 
   filter(Period == min(Period)) %>%
   group_by(Period) %>% 
   tally() %>% 
-  ggplot(aes(x = Period, y = n, color = n)) +
-  geom_line() +
-  geom_point()
+  ggplot(aes(x = Period, y = n)) +
+  geom_col() +
+  scale_x_date(date_breaks = "1 year", date_labels = "%Y") +
+  scale_y_continuous(labels = scales::comma_format()) +
+  labs(title = 'Users by first tweet date',
+       subtitle = paste0('n tweets = ', scales::comma_format()(nrow(tweets)), "\n",
+                         'n users = ', scales::comma_format()(n_distinct(tweets$handle))),
+       caption = paste0("As of ", Sys.Date()),
+       x = NULL,
+       y = 'Count of users') +
+  theme(legend.position = 'none',
+        axis.text.x = element_text(angle = 40, hjust = 1))
+ggsave("Plots/users_by_first_tweet.png",
+       width = 8,
+       height = 5)
+
+
+
+IDs <- map_dfr(list.files('Tweets/Functions/IDs', pattern = "*.csv"), function(file){
+  read_csv(paste0("Tweets/Functions/IDs/", file))
+}) %>% dplyr::select(-X1)
+
+n_distinct(IDs)
