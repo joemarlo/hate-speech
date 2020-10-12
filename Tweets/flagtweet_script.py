@@ -17,7 +17,7 @@ for index, js in enumerate(json_files):
 df = pd.concat(dfs)
 
 # Load hatespeech:
-hatespeech = pd.read_csv("Data/hatespeech.csv", header=None)
+hatespeech = pd.read_csv("Dictionary/hatespeech.csv", header=None)
 hatespeech = list(hatespeech[0])
 
 # Run flagtweet function on tweet data
