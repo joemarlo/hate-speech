@@ -2,6 +2,8 @@
 
 Final project for NYU Statistical Consulting class.
 
+**Warning: this project contains vulgar and offensive language.**
+
 ## Current collection status
 
 <p align="center">
