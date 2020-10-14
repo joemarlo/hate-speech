@@ -5,6 +5,7 @@ __pycache__/
 Tweets/Data/
 Tweets/Functions/IDs/
 Tweets/Functions/*.csv
+Tweets/IDs/
 .Rhistory
 .DS_Store
 .DS_store

@@ -12,13 +12,17 @@ tweets <- map_dfr(list.files("Tweets/Data", pattern = ".json"),
       tweets <- map_dfc(names(tweets_json), function(col){
         unlist(tweets_json[[col]])
       }) %>% 
-        setNames(names(tweets_json))
+        setNames(names(tweets_json)) %>% 
+        mutate(source_file = file)
       
       return(tweets)
     }) %>% 
   # created_at field is milliseconds since 1970
   mutate(Date = as.Date(lubridate::as_datetime(created_at/1000)))
-    
+
+# remove duplicates
+tweets <- distinct(tweets %>% dplyr::select(-source_file))
+
 # tweets per user
 tweets %>% 
   group_by(handle) %>% 
@@ -44,7 +48,7 @@ tweets %>%
   tally() %>% 
   ggplot(aes(x = Period, y = n, color = n)) +
   geom_rect(xmin = as.Date("2016-07-01"), xmax = as.Date("2017-12-01"),
-            ymin = 0, ymax = 50000, alpha = 0.3, fill = 'gray90', size = 0) +
+            ymin = 0, ymax = 100000, alpha = 0.3, fill = 'gray90', size = 0) +
   geom_line() +
   geom_point() +
   scale_x_date(date_breaks = "1 year", date_labels = "%Y") +
@@ -111,8 +115,16 @@ ggsave("Plots/users_by_first_tweet.png",
 
 
 
-IDs <- map_dfr(list.files('Tweets/Functions/IDs', pattern = "*.csv"), function(file){
-  read_csv(paste0("Tweets/Functions/IDs/", file))
-}) %>% dplyr::select(-X1)
+# IDs <- map_dfr(list.files('Tweets/Functions/IDs', pattern = "*.csv")[-201], function(file){
+#   read_csv(paste0("Tweets/Functions/IDs/", file))
+# }) %>% dplyr::select(-X1)
+# 
+# n_distinct(IDs)
 
-n_distinct(IDs)
+# there are a number of false positives that I think are captured because they
+#   match uppercase state names. Filtering include locations with 3 or more consecutive
+#   uppercase letters and then converting to lowercase and then running is_US()
+#   should remove many of these false positives
+# IDs %>% filter(str_count(location, "[A-Z]{4}") > 0) %>% View
+
+#write_csv(IDs, "Tweets/IDs/US_IDs_one.csv")
