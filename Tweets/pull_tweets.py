@@ -7,16 +7,16 @@ import numpy as np
 # import custom functions
 #os.chdir("/home/joemarlo/Dropbox/Data/Projects/hate-speech/Tweets/Functions")
 os.chdir("/home/pi/hate-speech/Tweets/Functions")
-script_directory = os.path.dirname(os.path.realpath(__file__))
-os.chdir(os.path.join(script_directory, "Functions"))
+#script_directory = os.path.dirname(os.path.realpath(__file__))
+#os.chdir(os.path.join(script_directory, "Functions"))
 from get_users_tweets import get_users_tweets
 
 # reset working directory
 #os.chdir("/home/joemarlo/Dropbox/Data/Projects/hate-speech")
 os.chdir("/home/pi/hate-speech")
 
-# read in the list of locations to match
-US_ids = pd.read_csv("Tweets/Functions/US_ids_20201009_162551.csv").drop("Unnamed: 0", axis=1)
+# read in the list of US IDs determined by generate_US_IDs.py
+US_ids = pd.read_csv("Tweets/IDs/US_IDs_one.csv")
 
 
 # run the function on randomly sampled tweets
