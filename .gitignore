@@ -2,7 +2,8 @@ twitter_credentials.py
 __pycache__
 __pycache__/
 
-Tweets/Data/
+Tweets/Data/v1
+Tweets/Data/v2
 Tweets/Functions/IDs/
 Tweets/Functions/*.csv
 Tweets/IDs/
