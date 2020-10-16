@@ -4,7 +4,7 @@
     <title>Quantifying LGBTQ+ Hate Speech on Twitter</title>
     <meta charset="utf-8" />
     <meta name="author" content="Joe Marlo + George Perrett + Bilal Waheed" />
-    <meta name="date" content="2020-10-15" />
+    <meta name="date" content="2020-10-16" />
     <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
     <link href="libs/remark-css-0.0.1/metropolis.css" rel="stylesheet" />
     <link href="libs/remark-css-0.0.1/metropolis-fonts.css" rel="stylesheet" />
@@ -17,7 +17,7 @@ class: center, middle, inverse, title-slide
 ## the promise and pitfalls of working with social media data
 ### Joe Marlo + George Perrett + Bilal Waheed
 ### NYU A3SR
-### 2020-10-15
+### 2020-10-16
 
 ---
 
@@ -49,33 +49,31 @@ class: inverse, center, middle
 
 ---
 
-# Sampling Stratagy
+# Sampling Goal
 
-Collect a random sample of 250,000 United States Twitter users
-- Use random number generation to identify 250,000 unique twitter users
-- filter out users not located in the United States
-- For each sampled user, collect all tweets from June of 2015 through June of 2017
+### Collect a random sample of United States Twitter users
+- Filter out users not located in the **United States**
+- For each sampled user, collect all tweets from **June of 2015 through June of 2017**
+- To ensure an adequate final sample size, we need approximately **250,000 accounts** 
 
 ---
 
-# Sampling By the Numbers  
+# Sampling Process 
 
-- Obtaining 250,000 users in the United States will require ~50 million random integers 
-
-- To bypass twitter API call limits, we can only make 900 API calls every 15 min. 
-
-- In order to obtain the sample, estimates suggest we will need 15 days of continuous API processing. 
-
-- To run days of continuous calls, we are using Raspberry Pi.
-
-- Based on pilot estimates, the final data set will contain 150 million tweets. 
+- Obtaining **250,000** users in the United States will require testing 30 million random integers against the Twitter API 
+- Per the Twitter API call limits, we can only make **900 API calls every 15 min**
+- In order to obtain the sample, estimates suggest we will need **20+ days** of continuous API processing
+- To run these days of continuous API calls, we are using a Raspberry Pi
+- Based on pilot estimates, the final data set will contain **150 million tweets**
 
 
 ---
 
-# Sampling Update
+class: center, inverse
 
-&lt;img src="Img/tweets_over_time.png"/&gt;  
+# Sampling Status
+
+&lt;img src="Img/tweets_over_time.png" style="width: 70%; align: center"&gt;
 
 ---
 
@@ -83,7 +81,6 @@ Collect a random sample of 250,000 United States Twitter users
 
 ## The Challenge:
 - Twitter IDs are currently 64-bit integers so it can be anything from 1 to 9,223,372,036,854,775,807
-
 - Random Sample is computationally unfeasible
 
 ## Solution:
@@ -96,7 +93,7 @@ Collect a random sample of 250,000 United States Twitter users
 ---
 class: inverse, center, middle
 
-# Part II: Idenify Hate Speech
+# Part II: Identify Hate Speech
 
 ---
 

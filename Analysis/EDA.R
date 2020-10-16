@@ -2,7 +2,7 @@ setwd("/home/joemarlo/Dropbox/Data/Projects/hate-speech")
 source('Plots/ggplot_settings.R')
 library(RSQLite)
 
-# connect to sqlite database
+# connect to sqlite database containing the tweets
 conn <- dbConnect(RSQLite::SQLite(), "tweets.db")
 
 # summary stats

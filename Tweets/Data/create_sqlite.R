@@ -3,18 +3,16 @@ source('Plots/ggplot_settings.R')
 library(RSQLite)
 
 
-# connect to database -----------------------------------------------------
-
-# connect to database NYC.db; if it doesn't exist this will
+# connect to database tweets.db; if it doesn't exist this will
 #  create it in the working directory
 conn <- dbConnect(RSQLite::SQLite(), "tweets.db")
 
 
 # read in and combine the data into one flat dataframe
-files <- list.files("Tweets/Data/v2/raw_jsons_US_tweets_one_two", pattern = ".json")
+files <- list.files("Tweets/Data/v2/Unprocessed_jsons", pattern = ".json")
 tweets <- map_dfr(files, function(file) {
   # read in the data
-  tweets_json <- jsonlite::fromJSON(txt = paste0("Tweets/Data/v2/raw_jsons_US_tweets_one_one/", file))
+  tweets_json <- jsonlite::fromJSON(txt = paste0("Tweets/Data/v2/Unprocessed_jsons/", file))
   
   # convert from nested json to flat df
   tweets <- map_dfc(names(tweets_json), function(col) {
@@ -32,7 +30,7 @@ tweets <- map_dfr(files, function(file) {
 tweets <- distinct(tweets, id, created_at, text, location, 
                    handle, user_id, Date, .keep_all = TRUE)
 
-# original table
+# create a new table in the db and add in the data
 # dbWriteTable(
 #   conn = conn,
 #   name = "Tweets",
@@ -52,6 +50,6 @@ dbWriteTable(
 # dbListTables(conn)
 
 # test a query
-# tbl(conn, "tweets") %>%
+# tbl(conn, "tweets") %>% tally()
 #   group_by(Source_file) %>%
 #   summarize(n.rows = n())
