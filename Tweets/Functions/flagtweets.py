@@ -12,16 +12,15 @@ def flagtweet(hatespeech, data):
 
     # check if elements in hatespeech are in the text (1 for true, 0 for false)
     # accounts for different variants of how the words appear in tweets (spaces before or after the word, or both):
-    df = pd.DataFrame({})
-    df['flagged1'] = np.multiply([any(" " + i in words for i in hatespeech) for words in data['text'].values], True)
-    df['flagged2'] = np.multiply([any(i + " " in words for i in hatespeech) for words in data['text'].values],True)
-    df['flagged3'] = np.multiply([any(" " + i + " " in words for i in hatespeech) for words in data['text'].values],True)
-    df['flagged4'] = np.multiply([any( i == words for i in hatespeech) for words in data['text'].values],True)
-    df['flagged'] = df.flagged1 | df.flagged2 | df.flagged3 | df.flagged4
+    data['flagged1'] = np.multiply([any(" " + i in words for i in hatespeech) for words in data['text'].values], True)
+    data['flagged2'] = np.multiply([any(i + " " in words for i in hatespeech) for words in data['text'].values],True)
+    data['flagged3'] = np.multiply([any(" " + i + " " in words for i in hatespeech) for words in data['text'].values],True)
+    data['flagged4'] = np.multiply([any( i == words for i in hatespeech) for words in data['text'].values],True)
+    data['flagged'] = data.flagged1 | data.flagged2 | data.flagged3 | data.flagged4
 
-    data = pd.concat([data.reset_index(drop = True), df['flagged']], axis = 1)
+    data.drop(columns = ['flagged1', 'flagged2', 'flagged3', 'flagged4'], inplace = True)
 
-    return data
+return data
 
 #---Test function on sample data----:
 
