@@ -20,7 +20,7 @@ def flagtweet(hatespeech, data):
 
     data.drop(columns = ['flagged1', 'flagged2', 'flagged3', 'flagged4'], inplace = True)
 
-return data
+    return data
 
 #---Test function on sample data----:
 
