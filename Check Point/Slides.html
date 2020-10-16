@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Quantifying LGBTQ+ Hate Speech on Twitter</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Joe Marlo + George Perrett + Bilal Waheed" />
+    <meta name="date" content="2020-10-15" />
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/metropolis.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/metropolis-fonts.css" rel="stylesheet" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Quantifying LGBTQ+ Hate Speech on Twitter
+## the promise and pitfalls of working with social media data
+### Joe Marlo + George Perrett + Bilal Waheed
+### NYU A3SR
+### 2020-10-15
+
+---
+
+
+# Inspiration
+
+&lt;img src="Img/Paper.png"/&gt;  
+
+---
+
+## Research Question:
+
+- Expand the methodological framework presented by Seigel et al., 2019 to study hate speech targeted at the LGBTQ+ community. 
+
+- Does the prevalence of LGBTQ+ hate speech in the United States change in accordance with political events?  
+
+
+### Hypotheses:
+
+1. There is a detectable baseline population level of LGBTQ+ directed hate speech on Twitter. 
+
+2. Hate speech increases immediately following LGBTQ+ relevant events (legalization of marriage, Trans military service executive order) and then returns to a baseline level. 
+
+---
+
+class: inverse, center, middle
+
+# Part I: Sampling
+
+---
+
+# Sampling Stratagy
+
+Collect a random sample of 250,000 United States Twitter users
+- Use random number generation to identify 250,000 unique twitter users
+- filter out users not located in the United States
+- For each sampled user, collect all tweets from June of 2015 through June of 2017
+
+---
+
+# Sampling By the Numbers  
+
+- Obtaining 250,000 users in the United States will require ~50 million random integers 
+
+- To bypass twitter API call limits, we can only make 900 API calls every 15 min. 
+
+- In order to obtain the sample, estimates suggest we will need 15 days of continuous API processing. 
+
+- To run days of continuous calls, we are using Raspberry Pi.
+
+- Based on pilot estimates, the final data set will contain 150 million tweets. 
+
+
+---
+
+# Sampling Update
+
+&lt;img src="Img/tweets_over_time.png"/&gt;  
+
+---
+
+# Challenge 1: Sampling Issues
+
+## The Challenge:
+- Twitter IDs are currently 64-bit integers so it can be anything from 1 to 9,223,372,036,854,775,807
+
+- Random Sample is computationally unfeasible
+
+## Solution:
+- IDs are issued quasi-sequentially and older IDs used to be much smaller
+- We can randomly sample from a sample space of 1 to 10,000,000,000 and still get a feasible ‘hit rate’
+
+## Cost:
+- Our sample is going to be biased towards users that have older accounts
+
+---
+class: inverse, center, middle
+
+# Part II: Idenify Hate Speech
+
+---
+
+# Three Stage Model
+
+Hate speech detection follows the framework set out by Seigel et al., 2019
+
+## Stage 1:
+
+- Develop a content dictionary of LGBTQ+ specific hate speech terminology
+
+- Terms and phrases were obtained from [hatebase.org]("https://hatebase.org/), an NGO that documents hate speech terminology
+
+- Currently, content dictionary includes 71 unique terms/phrases
+
+## Stage II:
+
+- Use content dictionary to filter tweet dataset
+
+
+## Stage III:
+
+- The majority of tweets identified by the content dictionary will not actually be hate speech. In Seigel 2019, 7% of tweets identified actually *condemned* hate speech
+
+- Develop Naive Bayes or RNN model to identify "fasle flags" and actual instances of hate speech. 
+
+---
+
+# Identification Update
+
+## Pilot of ~ 5 million tweets:
+
+- Draft of content dictionary has been created, but iterations are continuing
+
+- The content dictionary flagged .5% of tweets ~ 25000 tweets flagged
+
+- Based on this estimate, we expect to have 750,000 tweets that will be classifed by the machine learning model. 
+
+---
+
+# Challenge 2: Computational Memory
+
+## The Challenge:
+
+- As the number of tweets increases, R/Python memory limitations are reached. 
+
+- The text nature of the data adds additional memory constraints 
+
+## The Solution: 
+
+- Data processing and machine learning model fitting will be done using Spark/Scala
+
+- Spark processes are a distributed computing framework designed to process high volumes of data in parallel. 
+
+---
+
+# Challenge 3: Labeling Tweets
+
+## The Challenge (Part i):
+
+- Building supervised machine learning models requires a labeled 'ground truth' set of responses. In the context of this project, 10,000-25,000 tweets need to be labeled as true instances of hate speech or as a false flag. 
+
+## The Solution (Part i):
+
+- Use MTurk to obtain labeled tweets. 
+
+- Obtaining enough MTurk ratings for would require ~ $1000. We applied for an NYU sponsored grant to help cover MTurk costs. 
+
+- Use Kappa statistic to maximize rating accuracy in an efficient way. 
+
+## The Challenge (Part ii)
+
+- Due to financial uncertainties in higher education, the grant we applied for has been frozen. 
+
+## The Solution (Part ii):
+
+- The research team will manually label as many tweets as possible. 
+
+---
+
+# Project Overview
+
+## An exercise in applied research 
+
+- Grant writing is an essential part of research in Academia
+
+- Sometimes compromises need to be maid in sampling strategies
+
+## Skills we are developing 
+
+- Obtaining real world data directly from the source 
+
+- Using parallel computing frameworks
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false,
+"ratio": "16:9"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
