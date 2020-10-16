@@ -12,10 +12,10 @@ def flagtweet(hatespeech, data):
 
     # check if elements in hatespeech are in the text (1 for true, 0 for false)
     # accounts for different variants of how the words appear in tweets (spaces before or after the word, or both):
-    data['flagged1'] = np.multiply([any(" " + i in words for i in hatespeech) for words in data['text'].values], True)
-    data['flagged2'] = np.multiply([any(i + " " in words for i in hatespeech) for words in data['text'].values],True)
-    data['flagged3'] = np.multiply([any(" " + i + " " in words for i in hatespeech) for words in data['text'].values],True)
-    data['flagged4'] = np.multiply([any( i == words for i in hatespeech) for words in data['text'].values],True)
+    data['flagged1'] = [any(" " + i in words for i in hatespeech) for words in data['text'].values]
+    data['flagged2'] = [any(i + " " in words for i in hatespeech) for words in data['text'].values]
+    data['flagged3'] = [any(" " + i + " " in words for i in hatespeech) for words in data['text'].values]
+    data['flagged4'] = [any( i == words for i in hatespeech) for words in data['text'].values]
     data['flagged'] = data.flagged1 | data.flagged2 | data.flagged3 | data.flagged4
 
     data.drop(columns = ['flagged1', 'flagged2', 'flagged3', 'flagged4'], inplace = True)
