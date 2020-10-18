@@ -1,6 +1,6 @@
 ---
 title: "Quantifying LGBTQ+ Hate Speech on Twitter"
-subtitle: "the promise and pitfalls of working with social media data"
+subtitle: "The promise and pitfalls of working with social media data"
 author: "Joe Marlo + George Perrett + Bilal Waheed"
 institute: "NYU A3SR"
 date: "`r Sys.Date()`"
@@ -67,6 +67,14 @@ class: center, inverse
 # Sampling Status
 
 <img src="Img/tweets_over_time.png" style="width: 70%; align: center">
+
+---
+
+class: center, inverse
+
+# Sampling Status
+
+<img src="Img/users_by_first_tweet.png" style="width: 70%; align: center">
 
 ---
 

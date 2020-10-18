@@ -16,6 +16,7 @@ tbl(conn, "Tweets") %>%
   ggplot(aes(x = n)) +
   geom_histogram(color = 'white', bins = 20) +
   scale_x_continuous(labels = scales::comma_format()) +
+  scale_y_continuous(labels = scales::comma_format()) +
   labs(title = 'Tweets collected per user',
        subtitle = paste0('n tweets = ', scales::comma_format()(n_tweets), "\n",
                          'n users = ', scales::comma_format()(n_users)),
@@ -39,16 +40,16 @@ tweet_tally <- tbl(conn, "Tweets") %>%
   tally()
 tweet_tally %>% 
   ggplot(aes(x = Period, y = n)) +
-  geom_rect(xmin = as.Date("2016-07-01"), xmax = as.Date("2017-12-01"),
-            ymin = 0.9  * tweet_tally %>% filter(Period %in% seq(as.Date("2016-07-01"), as.Date("2017-12-01"), by = 'month')) %>% pull(n) %>% min(),
-            ymax = 1.1 * tweet_tally %>% filter(Period %in% seq(as.Date("2016-07-01"), as.Date("2017-12-01"), by = 'month')) %>% pull(n) %>% max(), 
-            alpha = 0.3, fill = 'gray90', size = 0) +
-  annotate(geom = 'text', 
-           x = as.Date("2016-07-01"),
-           y = 1.3 * tweet_tally %>% filter(Period %in% seq(as.Date("2016-07-01"), as.Date("2017-12-01"), by = 'month')) %>% pull(n) %>% max(),
-           label = "Observation\nperiod",
-           family = 'Helvetica', hjust = 0, size = 3, color = 'grey30', fontface = "bold"
-           ) +
+  # geom_rect(xmin = as.Date("2016-07-01"), xmax = as.Date("2017-12-01"),
+  #           ymin = 0.9  * tweet_tally %>% filter(Period %in% seq(as.Date("2016-07-01"), as.Date("2017-12-01"), by = 'month')) %>% pull(n) %>% min(),
+  #           ymax = 1.1 * tweet_tally %>% filter(Period %in% seq(as.Date("2016-07-01"), as.Date("2017-12-01"), by = 'month')) %>% pull(n) %>% max(), 
+  #           alpha = 0.3, fill = 'gray90', size = 0) +
+  # annotate(geom = 'text', 
+  #          x = as.Date("2016-07-01"),
+  #          y = 1.3 * tweet_tally %>% filter(Period %in% seq(as.Date("2016-07-01"), as.Date("2017-12-01"), by = 'month')) %>% pull(n) %>% max(),
+  #          label = "Observation\nperiod",
+  #          family = 'Helvetica', hjust = 0, size = 3, color = 'grey30', fontface = "bold"
+  #          ) +
   geom_line(color = 'grey30') +
   geom_point(color = 'grey30') +
   scale_x_date(date_breaks = "1 year", date_labels = "%Y") +
@@ -76,14 +77,15 @@ tbl(conn, "Tweets") %>%
                                  ceiling(lubridate::month(Date) / 6) * 6, "-01"))
     ) %>%
   group_by(handle) %>% 
-  filter(Period == min(Period)) %>%
+  arrange(Period) %>% 
+  slice_head(n = 1) %>% 
   group_by(Period) %>% 
   tally() %>% 
   ggplot(aes(x = Period, y = n)) +
   geom_col() +
   scale_x_date(date_breaks = "1 year", date_labels = "%Y") +
   scale_y_continuous(labels = scales::comma_format()) +
-  labs(title = 'Users by first tweet date',
+  labs(title = 'Users by first collected tweet date',
        subtitle = paste0('n tweets = ', scales::comma_format()(n_tweets), "\n",
                          'n users = ', scales::comma_format()(n_users)),
        caption = paste0("As of ", Sys.Date()),
