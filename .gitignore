@@ -7,6 +7,7 @@ Tweets/Data/v2
 Tweets/Functions/IDs/
 Tweets/Functions/*.csv
 Tweets/IDs/
+Dictionary/
 tweets.db
 .Rhistory
 .DS_Store
