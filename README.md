@@ -4,13 +4,6 @@ Final project for NYU Statistical Consulting class.
 
 **Warning: this project contains vulgar and offensive language.**
 
-## Current collection status
-
-<p align="center">
-<img src="Plots/tweets_over_time.png" width=79%>
-</p>
-
-
 ## Background
 Hate speech on social media has been identified as a major problem, yet little is know about the prevalence and patterns of hate speech on social media sites. In a [2019 paper](https://alexandra-siegel.com/wp-content/uploads/2019/05/Siegel_et_al_election_hatespeech_qjps.pdf), Siegel and colleagues investigated the prevalence of racially motivated hate speech on twitter in the months before, during and after the 2016 presidential election. For this project, we aim to replicate these research methods to investigate LGBTQ+ directed hate speech.
 
@@ -28,16 +21,3 @@ We have developed a content dictionary of words associated with LGBTQ+ directed 
 - [Tweepy](http://docs.tweepy.org/en/latest/)
 - [Hate speech](https://hatebase.org/)
 - [Top US cities by population](https://www.census.gov/data/tables/time-series/demo/popest/2010s-total-cities-and-towns.html#ds)
-
-### Usage
-1. Clone this repo
-2. Add file `twitter_credentials.py` to the root folder that defines the following objects:
-    - `consumer_key`
-    - `consumer_secret`
-    - `access_key`
-    - `access_secret`
-3. Navigate to the root folder and run `ipython Tweets/pull_tweets.py` in terminal. Pulled tweets will be saved into Tweets/Data/*.json after sampling every 5,000 user ids. Note that the following packages should be installed beforehand (e.g. `pip3 install numpy`):
-    - `numpy`
-    - `pandas`
-    - `tweepy`
-    - `ipython`
