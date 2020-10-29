@@ -40,16 +40,6 @@ tweet_tally <- tbl(conn, "Tweets") %>%
   tally()
 tweet_tally %>% 
   ggplot(aes(x = Period, y = n)) +
-  # geom_rect(xmin = as.Date("2016-07-01"), xmax = as.Date("2017-12-01"),
-  #           ymin = 0.9  * tweet_tally %>% filter(Period %in% seq(as.Date("2016-07-01"), as.Date("2017-12-01"), by = 'month')) %>% pull(n) %>% min(),
-  #           ymax = 1.1 * tweet_tally %>% filter(Period %in% seq(as.Date("2016-07-01"), as.Date("2017-12-01"), by = 'month')) %>% pull(n) %>% max(), 
-  #           alpha = 0.3, fill = 'gray90', size = 0) +
-  # annotate(geom = 'text', 
-  #          x = as.Date("2016-07-01"),
-  #          y = 1.3 * tweet_tally %>% filter(Period %in% seq(as.Date("2016-07-01"), as.Date("2017-12-01"), by = 'month')) %>% pull(n) %>% max(),
-  #          label = "Observation\nperiod",
-  #          family = 'Helvetica', hjust = 0, size = 3, color = 'grey30', fontface = "bold"
-  #          ) +
   geom_line(color = 'grey30') +
   geom_point(color = 'grey30') +
   scale_x_date(date_breaks = "1 year", date_labels = "%Y") +
@@ -97,17 +87,3 @@ ggsave("Plots/users_by_first_tweet.png",
        width = 8,
        height = 5)
 
-
-# IDs <- map_dfr(list.files('Tweets/Functions/IDs', pattern = "*.csv")[-201], function(file){
-#   read_csv(paste0("Tweets/Functions/IDs/", file))
-# }) %>% dplyr::select(-X1)
-# 
-# n_distinct(IDs)
-
-# there are a number of false positives that I think are captured because they
-#   match uppercase state names. Filtering include locations with 3 or more consecutive
-#   uppercase letters and then converting to lowercase and then running is_US()
-#   should remove many of these false positives
-# IDs %>% filter(str_count(location, "[A-Z]{4}") > 0) %>% View
-
-#write_csv(IDs, "Tweets/IDs/US_IDs_one.csv")
