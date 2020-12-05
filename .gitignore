@@ -8,7 +8,9 @@ Tweets/Functions/IDs/
 Tweets/Functions/*.csv
 Tweets/IDs/
 Dictionary/
+Predictions/
 tweets.db
+
 .Rhistory
 .DS_Store
 .DS_store
