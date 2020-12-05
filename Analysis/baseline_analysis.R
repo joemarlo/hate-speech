@@ -153,3 +153,65 @@ tweet_tally_weekly %>%
   full_join(flagged_tweets_weekly, by = 'Period') %>%
   mutate(Proportion = Flagged / n) %>% 
   write_csv("Analysis/flagged_rate_weekly.csv")
+
+
+
+# 2015 anlaysis -----------------------------------------------------------
+
+# June 26th supreme court decision date
+tweet_tally_weekly %>% 
+  full_join(flagged_tweets_weekly, by = 'Period') %>%
+  mutate(proportion = Flagged / n,
+         Threshold = Period >= as.Date("2015-06-26")) %>% 
+  filter(lubridate::year(Period) == 2015) %>% 
+  ggplot(aes(x = Period, y = proportion, color = Threshold)) +
+  geom_line() +
+  geom_point() +
+  geom_vline(xintercept = as.Date("2015-06-26"), linetype = 'dashed') +
+  geom_smooth(method = 'lm') +
+  scale_x_date(date_breaks = "1 month", date_labels = "%Y-%m") +
+  scale_y_continuous(labels = scales::comma_format()) +
+  labs(title = 'Before and after marriage equality (2015-06-20)',
+       x = 'Week',
+       y = 'Proportional of tweets') +
+  theme(legend.position = 'none',
+        axis.text.x = element_text(angle = 40, hjust = 1))
+  
+  
+# July 26th 2017 -> Trump twitter military ban
+tweet_tally_weekly %>% 
+  full_join(flagged_tweets_weekly, by = 'Period') %>%
+  mutate(proportion = Flagged / n,
+         Threshold = Period >= as.Date("2016-07-26")) %>% 
+  filter(lubridate::year(Period) == 2016) %>% 
+  ggplot(aes(x = Period, y = proportion, color = Threshold)) +
+  geom_line() +
+  geom_point() +
+  geom_vline(xintercept = as.Date("2016-07-26"), linetype = 'dashed') +
+  geom_smooth(method = 'lm') +
+  scale_x_date(date_breaks = "1 month", date_labels = "%Y-%m") +
+  scale_y_continuous(labels = scales::comma_format()) +
+  labs(title = 'Before and after transgender ban (2016-07-26)',
+       x = 'Week',
+       y = 'Proportional of tweets') +
+  theme(legend.position = 'none',
+        axis.text.x = element_text(angle = 40, hjust = 1))
+
+# January 20th 2017 -> Trump inauguration
+tweet_tally_weekly %>% 
+  full_join(flagged_tweets_weekly, by = 'Period') %>%
+  mutate(proportion = Flagged / n,
+         Threshold = Period >= as.Date("2017-01-20")) %>% 
+  filter(lubridate::year(Period) %in% 2016:2017) %>% 
+  ggplot(aes(x = Period, y = proportion, color = Threshold)) +
+  geom_line() +
+  geom_point() +
+  geom_vline(xintercept = as.Date("2017-01-20"), linetype = 'dashed') +
+  geom_smooth(method = 'lm') +
+  scale_x_date(date_breaks = "1 month", date_labels = "%Y-%m") +
+  scale_y_continuous(labels = scales::comma_format()) +
+  labs(title = 'Before and after Trump inauguration (2017-01-20)',
+       x = 'Week',
+       y = 'Proportional of tweets') +
+  theme(legend.position = 'none',
+        axis.text.x = element_text(angle = 40, hjust = 1))
