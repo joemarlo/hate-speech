@@ -138,10 +138,10 @@ tweet_tally_weekly %>%
   scale_x_date(date_breaks = "1 year", date_labels = "%Y") +
   scale_y_continuous(labels = scales::comma_format()) +
   labs(title = 'Proportion of tweets flagged as anti-LGBTQ+',
-       subtitle = paste0('Total tweets = ', scales::comma_format()(sum(tweet_tally$n)), "\n",
+       subtitle = paste0('Total tweets = ', scales::comma_format()(sum(tweet_tally_weekly$n)), "\n",
                          'Flagged tweets = ', scales::comma_format()(sum(flagged_tweets_weekly$Flagged))),
        x = 'Week',
-       y = 'Proportional of tweets') +
+       y = 'Proportion of tweets') +
   theme(legend.position = 'none',
         axis.text.x = element_text(angle = 40, hjust = 1))
 ggsave("Plots/flagged_tweets_by_week.png",
@@ -154,9 +154,65 @@ tweet_tally_weekly %>%
   mutate(Proportion = Flagged / n) %>% 
   write_csv("Analysis/flagged_rate_weekly.csv")
 
+# 
+tweet_tally_weekly_trimmed <- tweet_tally_weekly %>% 
+  full_join(flagged_tweets_weekly, by = 'Period') %>%
+  mutate(proportion = Flagged / n) %>% 
+  na.omit() %>% 
+  slice(-1)
+
+# dates
+dates <- tibble(Description = c('U.S. vs Windsor', 'Legalization of same-sex marriage', '2016 election', 'Transgender ban', 'Pulse nightclub shooting', 'Trump inauguration day'),
+                Dates = c(as.Date('2013-06-26'), as.Date('2015-05-01'), as.Date('2016-11-06'), as.Date('2017-07-26'), as.Date('2016-06-01'), as.Date('2017-01-20')))
+tweet_tally_weekly_trimmed %>% 
+  ggplot(aes(x = Period, y = proportion)) +
+  geom_line(color = 'grey30') +
+  geom_point(color = 'grey30') +
+  geom_vline(data = dates, aes(xintercept = Dates),
+             linetype = 'dashed') +
+  scale_x_date(date_breaks = "1 year", date_labels = "%Y") +
+  scale_y_continuous(labels = scales::comma_format()) +
+  labs(title = 'Proportion of tweets flagged as anti-LGBTQ+',
+       subtitle = paste0('Total tweets = ', scales::comma_format()(sum(tweet_tally_weekly$n)), "\n",
+                         'Flagged tweets = ', scales::comma_format()(sum(flagged_tweets_weekly$Flagged))),
+       x = 'Week',
+       y = 'Proportion of tweets') +
+  theme(legend.position = 'none',
+        axis.text.x = element_text(angle = 40, hjust = 1))
+ggsave("Plots/flagged_tweets_vlines.png",
+       width = 8,
+       height = 5)
+
+# facet plot of each date
+map2_dfr(.x = dates$Description,
+        .y = dates$Dates, 
+        .f = function(desc, date){
+          tweet_tally_weekly_trimmed %>% 
+            filter(Period >= (date - lubridate::years(1)),
+                   Period <= (date + lubridate::years(1))) %>% 
+            mutate(date = date,
+                   desc = desc)
+        }) %>% 
+  mutate(Term = Period < date) %>% 
+  ggplot(aes(x = Period, y = proportion, color = Term)) +
+  geom_line() +
+  geom_point() +
+  geom_vline(aes(xintercept = date),
+             linetype = 'dashed') +
+  facet_wrap(~desc, scales = 'free_x') +
+  scale_x_date(date_breaks = "3 months", date_labels = "%Y-%m") +
+  scale_y_continuous(labels = scales::comma_format()) +
+  labs(title = 'Key dates of political and social events',
+       x = NULL,
+       y = 'Proportion of tweets that are flagged') +
+  theme(legend.position = 'none',
+        axis.text.x = element_text(angle = 40, hjust = 1))
+ggsave("Plots/flagged_tweets_facets.png",
+       width = 11,
+       height = 7)
 
 
-# 2015 anlaysis -----------------------------------------------------------
+# 2015 analysis -----------------------------------------------------------
 
 # June 26th supreme court decision date
 tweet_tally_weekly %>% 
