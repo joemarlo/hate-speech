@@ -304,6 +304,7 @@ tweet_tally_bandwidth %>%
   left_join(results %>% filter(term == 'groupTRUE:index'), by = 'description') %>% 
   mutate(label = paste0(description, ": ", cutpoint_date, '\np value = ', round(p.value_adjusted, 3))) %>% 
   ggplot(aes(x = Period, y = proportion, group = group, color = group)) +
+  geom_line() +
   geom_point() +
   geom_smooth(method = 'lm', formula = y ~ x, color = 'black') +
   geom_vline(aes(xintercept = cutpoint_date),
