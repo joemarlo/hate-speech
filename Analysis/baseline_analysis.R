@@ -275,6 +275,7 @@ results %>%
   geom_hline(yintercept = 0.05)
 
 # plot the estimates
+# TODO: fix names, how to represent bonferroni adjustment?
 results %>% 
   filter(term %in% c('groupTRUE:index', 'groupTRUE')) %>% 
   mutate(term = recode(term, 'groupTRUE:index' = 'Slope', 'groupTRUE' = 'Difference (?)'), # better names for these?
@@ -297,36 +298,6 @@ results %>%
 ggsave("Plots/flagged_tweets_estimates.png",
        width = 9,
        height = 5)
-
-
-mlm_models %>% 
-  mutate(tidied = map(model, function(model){
-    # extract the standard error of the random errors
-    standard_errors <- arm::se.ranef(model)$cluster[,'year']
-    
-    # calculate the confidence interval
-    coef(model)$cluster %>% 
-      as.data.frame() %>%
-      rownames_to_column() %>%
-      mutate(lower = year - (1.96 * standard_errors),
-             upper = year + (1.96 * standard_errors))
-  })) %>% 
-  unnest(tidied) %>% 
-  select(method, description = rowname, estimate = year, lower, upper) %>% 
-  ungroup() %>% 
-  mutate(description = factor(description, 
-                              levels = c('Day workers', 'Night workers', 'Students', 'Uncategorized'))) %>%
-  ggplot(aes(x = estimate, y = method, color = description, xmin = lower, xmax = upper)) +
-  geom_point() +
-  geom_linerange() +
-  # scale_x_continuous(limits = c(-0.025, 0.015)) +
-  facet_grid(description~., scales = 'free_x') +
-  labs(title = "Estimates from linear MLMs", # and 95% confidence interval",
-       subtitle = "Four MLM models fitted individually by edit distance method ",
-       x = "\nAnnual change in sqrt(time spent alone)",
-       y = NULL) +
-  theme(legend.position = 'none',
-        strip.text.y = element_text(size = 7))
 
 # plot the slopes
 tweet_tally_bandwidth %>% 
