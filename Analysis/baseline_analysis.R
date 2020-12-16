@@ -302,9 +302,9 @@ results %>%
                                 arrange(desc(estimate)) %>% 
                                 pull(description))) %>%
   ggplot(aes(x = estimate, y = description, xmin = lower, xmax = upper)) +
+  geom_vline(xintercept = 0, color = 'grey70', linetype = 'dashed') +
   geom_point() +
   geom_linerange() +
-  geom_vline(xintercept = 0, color = 'grey70', linetype = 'dashed') +
   facet_grid(~term, scales = 'free') +
   labs(title = "Estimates of the difference in means and the change in slope pre- and post-event",
        subtitle = 'Bonferroni adjusted 95% confidence interval',
