@@ -3,7 +3,7 @@ source('Plots/ggplot_settings.R')
 library(rdrobust)
 
 # establish dates for each event
-dates <- tibble(Description = c('Windsor v.s. US', 'Legalization of same-sex marriage', '2016 election', 'Transgender ban', 'Pulse nightclub shooting', 'Trump inauguration day'),
+dates <- tibble(Description = c('Windsor v.s. U.S.', 'Legalization of same-sex marriage', '2016 election', 'Transgender ban', 'Pulse nightclub shooting', 'Trump inauguration day'),
                 Dates = c(as.Date('2013-06-26'), as.Date('2015-06-26'), as.Date('2016-11-08'), as.Date('2017-07-26'), as.Date('2016-06-12'), as.Date('2017-01-20')))
 # read in the data
 tweet_tally_weekly_trimmed <- read_csv("Analysis/flagged_rate_weekly.csv") %>%
