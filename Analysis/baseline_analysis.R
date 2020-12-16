@@ -162,8 +162,8 @@ tweet_tally_weekly_trimmed <- tweet_tally_weekly %>%
   slice(-1)
 
 # dates
-dates <- tibble(Description = c('U.S. vs Windsor', 'Legalization of same-sex marriage', '2016 election', 'Transgender ban', 'Pulse nightclub shooting', 'Trump inauguration day'),
-                Dates = c(as.Date('2013-06-26'), as.Date('2015-05-01'), as.Date('2016-11-06'), as.Date('2017-07-26'), as.Date('2016-06-01'), as.Date('2017-01-20')))
+dates <- tibble(Description = c('Windsor v.s. US', 'Legalization of same-sex marriage', '2016 election', 'Transgender ban', 'Pulse nightclub shooting', 'Trump inauguration day'),
+                Dates = c(as.Date('2013-06-26'), as.Date('2015-06-26'), as.Date('2016-11-08'), as.Date('2017-07-26'), as.Date('2016-06-12'), as.Date('2017-01-20')))
 tweet_tally_weekly_trimmed %>% 
   ggplot(aes(x = Period, y = proportion)) +
   geom_line(color = 'grey30') +
@@ -194,11 +194,12 @@ map2_dfr(.x = dates$Description,
                    desc = desc)
         }) %>% 
   mutate(Term = Period < date) %>% 
-  ggplot(aes(x = Period, y = proportion, color = Term)) +
+  ggplot(aes(x = Period, y = proportion, color = Term, group = Term)) +
   geom_line() +
   geom_point() +
   geom_vline(aes(xintercept = date),
              linetype = 'dashed') +
+  geom_smooth(method = 'lm', color = 'black') +
   facet_wrap(~desc, scales = 'free_x') +
   scale_x_date(date_breaks = "3 months", date_labels = "%Y-%m") +
   scale_y_continuous(labels = scales::comma_format()) +
@@ -208,6 +209,89 @@ map2_dfr(.x = dates$Description,
   theme(legend.position = 'none',
         axis.text.x = element_text(angle = 40, hjust = 1))
 ggsave("Plots/flagged_tweets_facets.png",
+       width = 11,
+       height = 7)
+
+
+# bandwidth ---------------------------------------------------------------
+
+library(rdrobust)
+
+# uncomment these if starting here
+# # establish dates for each event
+# dates <- tibble(Description = c('Windsor v.s. US', 'Legalization of same-sex marriage', '2016 election', 'Transgender ban', 'Pulse nightclub shooting', 'Trump inauguration day'),
+#                 Dates = c(as.Date('2013-06-26'), as.Date('2015-06-26'), as.Date('2016-11-08'), as.Date('2017-07-26'), as.Date('2016-06-12'), as.Date('2017-01-20')))
+# # read in the data
+# tweet_tally_weekly_trimmed <- read_csv("Analysis/flagged_rate_weekly.csv") %>%
+#   na.omit() %>%
+#   slice(-1) %>% 
+#   rename(proportion = Proportion)
+
+# cleanup df
+tweet_tally <- tweet_tally_weekly_trimmed %>% 
+  mutate(index = row_number(),
+         proportion = proportion * 1e5)
+
+# add cutpoints
+dates <- dates %>% mutate(cutpoint = c(241, 345, 416, 454, 394, 427))
+
+# for each event, get the bandwidth specified from rdrobust and return the resulting dataframe
+tweet_tally_bandwidth <- pmap_dfr(.l = list(dates$Description, dates$cutpoint, dates$Dates), 
+                                  function(description, cutpoint, date){
+  
+  # get bandwidths from rdrobust
+  bandwidths <- rdrobust(y = tweet_tally$proportion, 
+                         x = tweet_tally$index,
+                         c = cutpoint,
+                         p = 1,
+                         bwselect = 'msetwo')$bws['h',]
+  
+  # filter the data to just the bandwidths
+  dat <- tweet_tally %>% 
+    filter(index >= (cutpoint - bandwidths['left']),
+           index <= (cutpoint + bandwidths['right'])) %>% 
+    mutate(group = (index >= cutpoint),
+           description = description,
+           cutpoint_date = date)
+  
+  return(dat)
+})
+
+# model each date
+results <- tweet_tally_bandwidth %>% 
+  group_by(description) %>% 
+  nest() %>% 
+  mutate(model = map(data, function(df) lm(proportion ~ group * index, data = df)),
+         tidied = map(model, function(model) broom::tidy(model))) %>% 
+  unnest(tidied) %>% 
+  mutate(p.value_adjusted = 1 - (1 - p.value)^12) %>% 
+  select(description, term, estimate, p.value, p.value_adjusted)
+
+# plot the p values
+results %>% 
+  filter(term == 'groupTRUE:index') %>% 
+  ggplot(aes(x = description, y = p.value_adjusted)) +
+  geom_col() +
+  geom_hline(yintercept = 0.05)
+
+# plot the slopes
+tweet_tally_bandwidth %>% 
+  left_join(results %>% filter(term == 'groupTRUE:index'), by = 'description') %>% 
+  mutate(label = paste0(description, ": ", cutpoint_date, '\np value = ', round(p.value_adjusted, 3))) %>% 
+  ggplot(aes(x = Period, y = proportion, group = group, color = group)) +
+  geom_point() +
+  geom_smooth(method = 'lm', formula = y ~ x, color = 'black') +
+  geom_vline(aes(xintercept = cutpoint_date),
+             linetype = 'dashed') +
+  facet_wrap(~label, scales = 'free') +
+  scale_x_date(date_breaks = "3 months", date_labels = "%Y-%m") +
+  scale_y_continuous(labels = scales::comma_format(accuracy = 1)) +
+  labs(title = 'Key dates of political and social events',
+       x = NULL,
+       y = 'Flagged tweets per 100,000 tweets') +
+  theme(legend.position = 'none',
+        axis.text.x = element_text(angle = 40, hjust = 1))
+ggsave("Plots/flagged_tweets_facets_bandwidth.png",
        width = 11,
        height = 7)
 
