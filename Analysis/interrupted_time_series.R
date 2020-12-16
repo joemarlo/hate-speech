@@ -2,8 +2,7 @@ setwd("/home/joemarlo/Dropbox/Data/Projects/hate-speech")
 source('Plots/ggplot_settings.R')
 library(rdrobust)
 
-
-# # establish dates for each event
+# establish dates for each event
 dates <- tibble(Description = c('Windsor v.s. US', 'Legalization of same-sex marriage', '2016 election', 'Transgender ban', 'Pulse nightclub shooting', 'Trump inauguration day'),
                 Dates = c(as.Date('2013-06-26'), as.Date('2015-06-26'), as.Date('2016-11-08'), as.Date('2017-07-26'), as.Date('2016-06-12'), as.Date('2017-01-20')))
 # read in the data
@@ -90,8 +89,11 @@ results %>%
                               levels = results %>% 
                                 filter(term == 'groupTRUE:index') %>% 
                                 arrange(desc(estimate)) %>% 
-                                pull(description))) %>%
-  ggplot(aes(x = estimate, y = description, xmin = lower, xmax = upper)) +
+                                pull(description)),
+         sig = if_else(p.value_adjusted <= 0.05,
+                       'Significant @ alpha = 0.05',
+                       'Not significant @ alpha = 0.05')) %>%
+  ggplot(aes(x = estimate, y = description, xmin = lower, xmax = upper, color = sig)) +
   geom_vline(xintercept = 0, color = 'grey70', linetype = 'dashed') +
   geom_point() +
   geom_linerange() +
@@ -99,11 +101,12 @@ results %>%
   labs(title = "Estimates of the difference in means and the change in slope pre- and post-event",
        subtitle = 'Bonferroni adjusted 95% confidence interval',
        x = NULL,
-       y = NULL) +
-  theme(legend.position = 'none')
+       y = NULL,
+       color = NULL) +
+  theme(legend.position = 'bottom')
 # ggsave("Plots/flagged_tweets_estimates.png",
 #        width = 11,
-#        height = 3.5)
+#        height = 4)
 
 # plot the slopes
 tweet_tally_bandwidth %>% 
