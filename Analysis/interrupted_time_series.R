@@ -19,20 +19,22 @@ tweet_tally <- tweet_tally_weekly_trimmed %>%
 # add cutpoints
 dates <- dates %>% mutate(cutpoint = c(241, 345, 416, 454, 394, 427))
 
-# for each event, get the bandwidth specified from rdrobust 
-# and return a dataframe with the observations within the bandwidth
+# for each event, get the coef and bandwidth specified from rdrobust 
+  # and return a dataframe with the observations within the bandwidth
 tweet_tally_bandwidth <- pmap_dfr(
   .l = list(dates$Description, dates$cutpoint, dates$Dates),
   function(description, cutpoint, date) {
-    # get bandwidths from rdrobust
-    bandwidths <-
-      rdrobust(
-        y = tweet_tally$proportion,
-        x = tweet_tally$index,
-        c = cutpoint,
-        p = 1,
-        bwselect = 'msetwo'
-      )$bws['h', ]
+    # model it
+    model <- rdrobust(
+      y = tweet_tally$proportion,
+      x = tweet_tally$index,
+      c = cutpoint,
+      p = 1,
+      bwselect = 'msetwo'
+    )
+
+    # extract bandwidths
+    bandwidths <- model$bws['h', ]
     
     # filter the data to just the bandwidths
     dat <- tweet_tally %>%
@@ -41,7 +43,10 @@ tweet_tally_bandwidth <- pmap_dfr(
       mutate(
         group = (index >= cutpoint),
         description = description,
-        cutpoint_date = date
+        cutpoint_date = date,
+        estimate = model$coef['Conventional',],
+        std.error = model$se['Conventional',],
+        p.value_adjusted = 1 - (1 - model$pv['Conventional',])^18
         )
     
     return(dat)
@@ -54,8 +59,8 @@ results <- tweet_tally_bandwidth %>%
   mutate(model = map(data, function(df) lm(proportion ~ group * index, data = df)),
          tidied = map(model, function(model) broom::tidy(model))) %>% 
   unnest(tidied) %>% 
-  mutate(p.value_adjusted = 1 - (1 - p.value)^12) %>% 
-  select(description, term, estimate, std.error, p.value, p.value_adjusted)
+  mutate(p.value_adjusted = 1 - (1 - p.value)^18) %>% 
+  select(description, term, estimate, std.error, p.value_adjusted)
 
 # model the difference in means
 results_diff_in_means <- tweet_tally_bandwidth %>% 
@@ -64,32 +69,26 @@ results_diff_in_means <- tweet_tally_bandwidth %>%
   mutate(model = map(data, function(df) lm(proportion ~ group, data = df)),
          tidied = map(model, function(model) broom::tidy(model))) %>% 
   unnest(tidied) %>% 
-  mutate(p.value_adjusted = 1 - (1 - p.value)^12) %>% 
+  mutate(p.value_adjusted = 1 - (1 - p.value)^18) %>% 
   filter(term == 'groupTRUE') %>% 
   mutate(term = recode(term, groupTRUE = 'Difference in means')) %>% 
-  select(description, term, estimate, std.error, p.value, p.value_adjusted)
+  select(description, term, estimate, std.error, p.value_adjusted)
 
-# plot the p values
-results %>% 
-  filter(term == 'groupTRUE:index') %>% 
-  ggplot(aes(x = description, y = p.value_adjusted)) +
-  geom_col() +
-  geom_hline(yintercept = 0.05)
+# clean up rdrobust output for plotting
+results_cutoff <- tweet_tally_bandwidth %>% 
+  distinct(description, .keep_all = TRUE) %>% 
+  mutate(term = 'Difference at cutoff') %>% 
+  select(description, term, estimate, std.error, p.value_adjusted)
 
 # plot the estimates
-# TODO: fix names, how to represent bonferroni adjustment?
 results %>% 
   filter(term == 'groupTRUE:index') %>% 
   bind_rows(results_diff_in_means) %>% 
-  mutate(term = recode(term, 'groupTRUE:index' = 'Slope', 'groupTRUE' = 'Difference (?)'), # better names for these?
+  bind_rows(results_cutoff) %>% 
+  mutate(term = recode(term, 'groupTRUE:index' = 'Slope'), 
          #https://www.researchgate.net/post/How_to_adjust_confidence_interval_for_multiple_testing
-         lower = estimate - (qnorm((1-0.05/12)) * std.error),
-         upper = estimate + (qnorm((1-0.05/12)) * std.error),
-         description = factor(description, 
-                              levels = results %>% 
-                                filter(term == 'groupTRUE:index') %>% 
-                                arrange(desc(estimate)) %>% 
-                                pull(description)),
+         lower = estimate - (qnorm((1-0.05/18)) * std.error),
+         upper = estimate + (qnorm((1-0.05/18)) * std.error),
          sig = if_else(p.value_adjusted <= 0.05,
                        'Significant @ alpha = 0.05',
                        'Not significant @ alpha = 0.05')) %>%
@@ -118,7 +117,7 @@ tweet_tally_bandwidth %>%
   geom_smooth(method = 'lm', formula = y ~ x, color = 'black') +
   geom_vline(aes(xintercept = cutpoint_date),
              linetype = 'dashed') +
-  facet_wrap(~description, scales = 'free') +
+  facet_wrap(~description, scales = 'free_x') +
   scale_x_date(date_breaks = "3 months", date_labels = "%Y-%m") +
   scale_y_continuous(labels = scales::comma_format(accuracy = 1)) +
   labs(title = 'Key dates of political and social events',
