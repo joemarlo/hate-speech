@@ -218,13 +218,13 @@ ggsave("Plots/flagged_tweets_facets.png",
 library(rdrobust)
 
 # uncomment these if starting here
-# # establish dates for each event
+# establish dates for each event
 # dates <- tibble(Description = c('Windsor v.s. US', 'Legalization of same-sex marriage', '2016 election', 'Transgender ban', 'Pulse nightclub shooting', 'Trump inauguration day'),
 #                 Dates = c(as.Date('2013-06-26'), as.Date('2015-06-26'), as.Date('2016-11-08'), as.Date('2017-07-26'), as.Date('2016-06-12'), as.Date('2017-01-20')))
 # # read in the data
 # tweet_tally_weekly_trimmed <- read_csv("Analysis/flagged_rate_weekly.csv") %>%
 #   na.omit() %>%
-#   slice(-1) %>% 
+#   slice(-1) %>%
 #   rename(proportion = Proportion)
 
 # cleanup df
@@ -265,7 +265,7 @@ results <- tweet_tally_bandwidth %>%
          tidied = map(model, function(model) broom::tidy(model))) %>% 
   unnest(tidied) %>% 
   mutate(p.value_adjusted = 1 - (1 - p.value)^12) %>% 
-  select(description, term, estimate, p.value, p.value_adjusted)
+  select(description, term, estimate, std.error, p.value, p.value_adjusted)
 
 # plot the p values
 results %>% 
@@ -273,6 +273,60 @@ results %>%
   ggplot(aes(x = description, y = p.value_adjusted)) +
   geom_col() +
   geom_hline(yintercept = 0.05)
+
+# plot the estimates
+results %>% 
+  filter(term %in% c('groupTRUE:index', 'groupTRUE')) %>% 
+  mutate(term = recode(term, 'groupTRUE:index' = 'Slope', 'groupTRUE' = 'Difference (?)'), # better names for these?
+         lower = estimate - (1.96 * std.error),
+         upper = estimate + (1.96 * std.error),
+         description = factor(description, 
+                              levels = results %>% 
+                                filter(term == 'groupTRUE:index') %>% 
+                                arrange(desc(estimate)) %>% 
+                                pull(description))) %>% 
+  ggplot(aes(x = estimate, y = description, color = description, xmin = lower, xmax = upper)) +
+  geom_point() +
+  geom_linerange() +
+  geom_vline(xintercept = 0, color = 'grey70', linetype = 'dashed') +
+  facet_grid(~term, scales = 'free') +
+  labs(title = "Estimates of the ... title?",
+       x = NULL,
+       y = NULL) +
+  theme(legend.position = 'none')
+ggsave("Plots/flagged_tweets_estimates.png",
+       width = 9,
+       height = 5)
+
+
+mlm_models %>% 
+  mutate(tidied = map(model, function(model){
+    # extract the standard error of the random errors
+    standard_errors <- arm::se.ranef(model)$cluster[,'year']
+    
+    # calculate the confidence interval
+    coef(model)$cluster %>% 
+      as.data.frame() %>%
+      rownames_to_column() %>%
+      mutate(lower = year - (1.96 * standard_errors),
+             upper = year + (1.96 * standard_errors))
+  })) %>% 
+  unnest(tidied) %>% 
+  select(method, description = rowname, estimate = year, lower, upper) %>% 
+  ungroup() %>% 
+  mutate(description = factor(description, 
+                              levels = c('Day workers', 'Night workers', 'Students', 'Uncategorized'))) %>%
+  ggplot(aes(x = estimate, y = method, color = description, xmin = lower, xmax = upper)) +
+  geom_point() +
+  geom_linerange() +
+  # scale_x_continuous(limits = c(-0.025, 0.015)) +
+  facet_grid(description~., scales = 'free_x') +
+  labs(title = "Estimates from linear MLMs", # and 95% confidence interval",
+       subtitle = "Four MLM models fitted individually by edit distance method ",
+       x = "\nAnnual change in sqrt(time spent alone)",
+       y = NULL) +
+  theme(legend.position = 'none',
+        strip.text.y = element_text(size = 7))
 
 # plot the slopes
 tweet_tally_bandwidth %>% 
