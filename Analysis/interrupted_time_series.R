@@ -46,7 +46,8 @@ tweet_tally_bandwidth <- pmap_dfr(
         cutpoint_date = date,
         estimate = model$coef['Conventional',],
         std.error = model$se['Conventional',],
-        p.value_adjusted = 1 - (1 - model$pv['Conventional',])^18
+        p.value = model$pv['Conventional',],
+        p.value_adjusted = 1 - (1 - p.value)^12
         )
     
     return(dat)
@@ -59,36 +60,24 @@ results <- tweet_tally_bandwidth %>%
   mutate(model = map(data, function(df) lm(proportion ~ group * index, data = df)),
          tidied = map(model, function(model) broom::tidy(model))) %>% 
   unnest(tidied) %>% 
-  mutate(p.value_adjusted = 1 - (1 - p.value)^18) %>% 
-  select(description, term, estimate, std.error, p.value_adjusted)
-
-# model the difference in means
-results_diff_in_means <- tweet_tally_bandwidth %>% 
-  group_by(description) %>% 
-  nest() %>% 
-  mutate(model = map(data, function(df) lm(proportion ~ group, data = df)),
-         tidied = map(model, function(model) broom::tidy(model))) %>% 
-  unnest(tidied) %>% 
-  mutate(p.value_adjusted = 1 - (1 - p.value)^18) %>% 
-  filter(term == 'groupTRUE') %>% 
-  mutate(term = recode(term, groupTRUE = 'Difference in means')) %>% 
-  select(description, term, estimate, std.error, p.value_adjusted)
+  mutate(p.value_adjusted = 1 - (1 - p.value)^12) %>% 
+  select(description, term, estimate, std.error, p.value, p.value_adjusted) %>% 
+  ungroup()
 
 # clean up rdrobust output for plotting
 results_cutoff <- tweet_tally_bandwidth %>% 
   distinct(description, .keep_all = TRUE) %>% 
-  mutate(term = 'Difference at cutoff') %>% 
-  select(description, term, estimate, std.error, p.value_adjusted)
+  mutate(term = 'Prevalence') %>% 
+  select(description, term, estimate, std.error, p.value, p.value_adjusted)
 
 # plot the estimates
 results %>% 
   filter(term == 'groupTRUE:index') %>% 
-  bind_rows(results_diff_in_means) %>% 
   bind_rows(results_cutoff) %>% 
-  mutate(term = recode(term, 'groupTRUE:index' = 'Slope'), 
+  mutate(term = recode(term, 'groupTRUE:index' = 'Incidence'), 
          #https://www.researchgate.net/post/How_to_adjust_confidence_interval_for_multiple_testing
-         lower = estimate - (qnorm((1-0.05/18)) * std.error),
-         upper = estimate + (qnorm((1-0.05/18)) * std.error),
+         lower = estimate - (qnorm((1-0.05/12)) * std.error),
+         upper = estimate + (qnorm((1-0.05/12)) * std.error),
          sig = if_else(p.value_adjusted <= 0.05,
                        'Significant @ alpha = 0.05',
                        'Not significant @ alpha = 0.05')) %>%
@@ -97,15 +86,28 @@ results %>%
   geom_point() +
   geom_linerange() +
   facet_grid(~term, scales = 'free') +
-  labs(title = "Estimates of the difference in means and the change in slope pre- and post-event",
-       subtitle = 'Bonferroni adjusted 95% confidence interval',
+  labs(title = "Estimates of the prevalance and incidence",
+       subtitle = 'Bonferroni adjusted values',
        x = NULL,
        y = NULL,
        color = NULL) +
   theme(legend.position = 'bottom')
 # ggsave("Plots/flagged_tweets_estimates.png",
-#        width = 11,
+#        width = 9,
 #        height = 4)
+
+# table of pvalues
+coef_table <- results %>% 
+  filter(term == 'groupTRUE:index') %>% 
+  bind_rows(results_cutoff) %>% 
+  mutate(term = recode(term, 'groupTRUE:index' = 'Incidence')) %>% 
+  select(description, term, estimate, p.value, p.value_adjusted) %>%
+  pivot_wider(names_from = 'term', values_from = c('estimate', 'p.value', 'p.value_adjusted'))
+
+# sort and clean up
+coef_table[match(c("2016 election", "Legalization of same-sex marriage", 'Pulse nightclub shooting', 'Transgender ban', 'Trump inauguration day', 'Windsor v.s. US'), coef_table$description),] %>% 
+  select(description, estimate_Incidence, p.value_Incidence, p.value_adjusted_Incidence, estimate_Prevalence, p.value_Prevalence, p.value_adjusted_Prevalence) %>% 
+  knitr::kable(digits = 3)
 
 # plot the slopes
 tweet_tally_bandwidth %>% 
