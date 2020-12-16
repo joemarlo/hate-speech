@@ -17,7 +17,7 @@ tweet_tally <- tweet_tally_weekly_trimmed %>%
          proportion = proportion * 1e5)
 
 # add cutpoints
-dates <- dates %>% mutate(cutpoint = c(241, 345, 416, 454, 394, 427))
+dates$cutpoint <- c(241, 345, 416, 454, 394, 427)
 
 # for each event, get the coef and bandwidth specified from rdrobust 
   # and return a dataframe with the observations within the bandwidth
@@ -120,6 +120,7 @@ tweet_tally_bandwidth %>%
   geom_vline(aes(xintercept = cutpoint_date),
              linetype = 'dashed') +
   facet_wrap(~description, scales = 'free_x') +
+  scale_color_manual(values = c('#00BFC4', '#F8766D')) +
   scale_x_date(date_breaks = "3 months", date_labels = "%Y-%m") +
   scale_y_continuous(labels = scales::comma_format(accuracy = 1)) +
   labs(title = 'Key dates of political and social events',
@@ -129,4 +130,37 @@ tweet_tally_bandwidth %>%
         axis.text.x = element_text(angle = 40, hjust = 1))
 # ggsave("Plots/flagged_tweets_facets_bandwidth.png",
 #        width = 11,
+#        height = 7)
+
+
+# Windsor vs US -----------------------------------------------------------
+
+# https://blog.twitter.com/official/en_us/a/2013/keep-up-with-conversations-on-twitter.html
+tmp <- tweet_tally_bandwidth %>%
+  filter(description == 'Windsor v.s. US') %>% 
+  mutate(group = if_else(Period <= as.Date('2013-06-26'), "before",
+                         if_else(Period <= as.Date('2013-08-28'), 'middle',
+                         'after')))
+tmp %>% 
+  ggplot(aes(x = Period, y = proportion, group = group, color = group)) +
+  geom_line() +
+  geom_point() +
+  geom_smooth(data = tmp %>% filter(group %in% c("before", 'after')),
+              method = 'lm', formula = y ~ x, color = 'black') +
+  geom_vline(aes(xintercept = as.Date('2013-06-26')), linetype = 'dashed') +
+  geom_vline(aes(xintercept = as.Date('2013-08-28')), linetype = 'dashed') +
+  annotate(geom = 'text', x = as.Date('2013-06-10'), y = 40, 
+           label = 'Windsor vs. U.S.', angle = 90) +
+  annotate(geom = 'text', x = as.Date('2013-09-10'), y = 80, 
+           label = 'Twitter policy change', angle = 90) +
+  scale_color_manual(values = c('#F8766D', '#00BFC4', 'grey50')) +
+  scale_x_date(date_breaks = "3 months", date_labels = "%Y-%m") +
+  scale_y_continuous(labels = scales::comma_format(accuracy = 1)) +
+  labs(title = 'Two key dates occuring within two months of each other: Windsor vs. U.S. and Twitter policy change',
+       x = NULL,
+       y = 'Flagged tweets per 100,000 tweets') +
+  theme(legend.position = 'none',
+        axis.text.x = element_text(angle = 40, hjust = 1))
+# ggsave("Plots/flagged_tweets_policy_change.png",
+#        width = 10,
 #        height = 7)
