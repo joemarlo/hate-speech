@@ -15,11 +15,15 @@ The divisive and polarizing rhetoric in the 2016 presidential election sparked c
 </p>
 
 <p align="center">
-<img src="Plots/flagged_tweets_estimates.png" width=70%>
+<img src="Plots/flagged_tweets_vlines.png" width=70%>
 </p>
 
 <p align="center">
 <img src="Plots/flagged_tweets_facets_bandwidth.png" width=70%>
+</p>
+
+<p align="center">
+<img src="Plots/flagged_tweets_estimates.png" width=70%>
 </p>
 
 <p align="center">
