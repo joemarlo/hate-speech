@@ -4,20 +4,24 @@ Final project for NYU Statistical Consulting class.
 
 **Warning: this project contains vulgar and offensive language.**
 
-## Background
-Hate speech on social media has been identified as a major problem, yet little is know about the prevalence and patterns of hate speech on social media sites. In a [2019 paper](https://alexandra-siegel.com/wp-content/uploads/2019/05/Siegel_et_al_election_hatespeech_qjps.pdf), Siegel and colleagues investigated the prevalence of racially motivated hate speech on twitter in the months before, during and after the 2016 presidential election. For this project, we aim to replicate these research methods to investigate LGBTQ+ directed hate speech.
+## Abstract
 
-### Research question
-How has the prevalence of LGBTQ+ directed hate speech on Twitter changed from the summer of 2015 through winter of 2017?
+The divisive and polarizing rhetoric in the 2016 presidential election sparked concern over popularizing hateful sentiments towards marginalized populations on Twitter. In this paper, we focus on the LGBTQ+ community and examine ~100 million tweets for the presence of hate speech targeted towards LGBTQ+ Americans as a result of key political and social events related to the LGBTQ+ community. Dictionary-based methods refined by logistic regression, Naive Bayes, and Recurrent Neural Network (RNN) machine learning classifiers were used to identify hate speech. We found no conclusive evidence of changes in prevalence or incidence of hate speech around key events. While some events saw brief upticks in prevalence, overall levels of hate speech remained stable. Our analysis finds exploratory evidence of decreases in prevalence of anti-LGBTQ+ hate speech (p < 0.001) over time coinciding with a Twitter policy change allowing users to directly report abuse.
 
-### Methods Summary
-Using random number generation, we will randomly select ~250,000 twitter user IDs from locations within the United States. After identifying a random sample of users, the [tweepy API](http://docs.tweepy.org/en/latest/) will be used to pull all users tweets from June of 2015 through June of 2017.
+## Results
 
-We have developed a content dictionary of words associated with LGBTQ+ directed hate speech obtained from [hatebase](https://hatebase.org/), a non-profit that identifies hate speech terms for academic and governmental research. The content dictionary will be used to identify all tweets that contain a word that is related to documented hate speech. While this approach is an effective filter, it is not an effective classifier. The content dictionary alone flags many tweets that are not actually hate speech but contain words that, in a different context, could be associated with hate speech. As an example, tweets explicitly condemning hate speech could be picked up the content dictionary. To refine the effectiveness of the content dictionary, we will follow the methods used by Siegel and colleagues (2019) and create a Naive Bayes machine learning classifier that will be used to classify hate speech among all the tweets flagged by the content dictionary. After using the content dictionary to filter tweets from the ~250,000 users we will select a random subset of 15,000 tweets that will be used to train and test the machine learning classifier. After building the model the classifier will be used to label the remaining tweets flagged by the content dictionary.
+<p align="center">
+<img src="Plots/ROC.png" width=40%>
+</p>
 
-## Documentation
+<p align="center">
+<img src="Plots/flagged_tweets_estimates.png" width=70%>
+</p>
 
-### Sources
-- [Tweepy](http://docs.tweepy.org/en/latest/)
-- [Hate speech](https://hatebase.org/)
-- [Top US cities by population](https://www.census.gov/data/tables/time-series/demo/popest/2010s-total-cities-and-towns.html#ds)
+<p align="center">
+<img src="Plots/flagged_tweets_facets_bandwidth.png" width=70%>
+</p>
+
+<p align="center">
+<img src="Plots/flagged_tweets_policy_change.png" width=70%>
+</p>
